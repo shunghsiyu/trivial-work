@@ -4,6 +4,20 @@
  * @version Apr 9, 2014
  */
 
+/*
+                      UML
+--------------------------------------------------
+|                  RoomCarpet                    |
+--------------------------------------------------
+| - size: RoomDimension                          |
+| - carpetCost: double                           |
+--------------------------------------------------
+| + RoomCarpet(dim: RoomDimension, cost: double) |
+| + getTotalCost(): double                       |
+| + toString: String                             |
+--------------------------------------------------
+*/
+
 package programming2.ch8.carpetcalculator;
 
 public class RoomCarpet {
