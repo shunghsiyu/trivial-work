@@ -1,0 +1,10 @@
+LD
+stall
+ADD.D
+stall
+stall
+SD
+SUBI
+*****ERROR*****
+BNEZ
+stall
