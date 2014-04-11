@@ -4,6 +4,20 @@
  * @version Apr 9, 2014
  */
 
+/*
+                      UML
+--------------------------------------------------
+|                 RoomDimension                  |
+--------------------------------------------------
+| - length: double                               |
+| - width: double                                |
+--------------------------------------------------
+| + RoomDimension(length: double, width: double) |
+| + getArea(): double                            |
+| + toString(): String                           |
+--------------------------------------------------
+*/
+
 package programming2.ch8.carpetcalculator;
 
 public class RoomDimension {
