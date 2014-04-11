@@ -4,6 +4,23 @@
  * @version Apr 9, 2014
  */
 
+/*
+                          UML
+----------------------------------------------------------
+|                      CashRegister                      |
+----------------------------------------------------------
+| $ TAX_RATE: double                                     |
+| - retailItem: RetailItem                               |
+| - quantity: int                                        |
+---------------------------------------------------------|
+| + CashRegister(retailItem: RetailItem, quantity: int)  |
+| + getSubTotal(): double                                |
+| + getTax(): double                                     |
+| + getTotal(): double                                   |
+| + getReceipt(): String                                 |
+----------------------------------------------------------
+*/
+
 package programming2.ch8.cashregister;
 
 
