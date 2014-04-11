@@ -3,6 +3,26 @@
  * @author Shung-Hsi Yu, syu07@nyit.edu, ID# 0906172
  */
 
+/*
+                               UML
+----------------------------------------------------------------------
+|                            RetailItem                              |
+----------------------------------------------------------------------
+| - description: String                                              |
+| - unitsOnHand: int                                                 |
+| - price: double                                                    |
+----------------------------------------------------------------------
+| + RetailItem(retailItemToCopy: RetailItem)                         |
+| + RetailItem(description: String, unitsOnHand: int, price: double) |
+| + getDescription(): String                                         |
+| + setDescription(description: String): void                        |
+| + getUnitsOnHand(): int                                            |
+| + setUnitsOnHand(unitsOnHand: int): void                           |
+| + getPrice(): double                                               |
+| + setPrice(price: double): void                                    |
+----------------------------------------------------------------------
+*/
+
 package programming2.ch8.cashregister;
 
 
