@@ -1,7 +1,0 @@
-SALES RECEIPT
-Item:        Jacket
-Unit Price:  $59.95
-Quantity:    2
-Subtotal:    $119.90
-Sales Tax:   $7.19
-Total:       $127.09
