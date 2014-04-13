@@ -24,15 +24,28 @@ public class RoomDimension {
     private final double length;
     private final double width;
 
+    /**
+     * Constructor for RoomDimension class.
+     * @param length length of the room
+     * @param width width of the room
+     */
     public RoomDimension(double length, double width) {
         this.length = length;
         this.width = width;
     }
     
+    /**
+     * Get the area of this RoomDimension instance.
+     * @return area of the room
+     */
     public double getArea() {
         return length*width;
     }
     
+    /**
+     * Get the String representation of this RoomDimension instance.
+     * @return the String representation of this RoomDimension instance
+     */
     @Override
     public String toString() {
         return length + "x" + width + " sqft";
