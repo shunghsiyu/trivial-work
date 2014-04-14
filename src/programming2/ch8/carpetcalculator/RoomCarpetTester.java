@@ -1,16 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Chapter 8 Programming Challenges 3.
+ * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
+ * @version Apr 9, 2014
  */
 
 package programming2.ch8.carpetcalculator;
 
-/**
- *
- * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
- * @version Apr 9, 2014
- */
+
 public class RoomCarpetTester {
     public static void main(String[] args) {
         // Create a RoomCarpet instance costing $8/sqft in a 12x10 ft room
