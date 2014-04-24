@@ -17,7 +17,7 @@ import java.util.Date;
  * @version Apr 23, 2014
  */
 public class Employee {
-    private static DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+    private static final DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
     private String name;
     private String employeeNumber;
     private Date hireDate;
