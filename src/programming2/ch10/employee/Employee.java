@@ -73,4 +73,18 @@ public class Employee {
         }
         return date;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: ");
+        sb.append(getName());
+        sb.append(String.format("%n"));
+        sb.append("Employee Number: ");
+        sb.append(getEmployeeNumber());
+        sb.append(String.format("%n"));
+        sb.append("Hire Date: ");
+        sb.append(getHireDate());
+        return sb.toString();
+    }
 }
