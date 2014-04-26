@@ -1,4 +1,4 @@
-package programming2.ch10.essay;
+package programming2.ch10.grade;
 
 /**
    This program demonstrates a solution to 

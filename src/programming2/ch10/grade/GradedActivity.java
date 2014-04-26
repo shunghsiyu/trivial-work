@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package programming2.ch10.essay;
+package programming2.ch10.grade;
 
 /**
  *
