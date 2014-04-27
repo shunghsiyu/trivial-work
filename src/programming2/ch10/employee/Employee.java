@@ -1,3 +1,9 @@
+/**
+ * Chapter 10 Programming Challenges 1.
+ * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
+ * @version Apr 23, 2014
+ */
+
 /*
                                     UML
 -----------------------------------------------------------------------------
@@ -28,11 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- *
- * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
- * @version Apr 23, 2014
- */
+
 public class Employee {
     // For parsing the hire date
     private static final DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
