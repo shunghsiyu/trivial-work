@@ -1,12 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+                                 UML
+-------------------------------------------------------------------------
+|                               Essay                                   |
+-------------------------------------------------------------------------
+| - grammar: double                                                     |
+| - spelling: double                                                    |
+| - correctLength: double                                               |
+| - content: double                                                     |
+-------------------------------------------------------------------------
+| + setScore(grammer: double, spelling: double, correctLength:double,   |
+|     content: double)                                                  |
+| + getGrammer(): double                                                |
+| + getSpelling(): double                                               |
+| + getCorrectLength(): double                                          |
+| + getContent(): double                                                |
+| - checkScore(scoreToCheck: double)                                    |
+-------------------------------------------------------------------------
  */
 
 package programming2.ch10.grade;
 
-import programming2.ch10.grade.GradedActivity;
 
 
 
@@ -21,6 +34,13 @@ public class Essay extends GradedActivity {
     private double correctLength;
     private double content;
 
+    /**
+     * Set the score of this Essay instance.
+     * @param grammar grammar points
+     * @param spelling spelling points
+     * @param correctLength length points
+     * @param content content points
+     */
     public void setScore(double grammar, double spelling, double correctLength, 
             double content) {
         super.setScore(grammar + spelling + correctLength + content);
@@ -30,22 +50,43 @@ public class Essay extends GradedActivity {
         this.content = checkScore(content);
     }
 
+    /**
+     * Get the grammar points.
+     * @return grammar points
+     */
     public double getGrammar() {
         return grammar;
     }
 
+    /**
+     * Get the spelling points.
+     * @return spelling points
+     */
     public double getSpelling() {
         return spelling;
     }
 
+    /**
+     * Get the length points.
+     * @return length points
+     */
     public double getCorrectLength() {
         return correctLength;
     }
 
+    /**
+     * Get the content points.
+     * @return content points
+     */
     public double getContent() {
         return content;
     }
     
+    /**
+     * Check whether or not a score is within the correct range.
+     * @param scoreToCheck the input score to check
+     * @return the same input score
+     */
     public double checkScore(double scoreToCheck) {
         if(scoreToCheck > 100) {
             throw new IllegalArgumentException("A score cannot be higher than "
