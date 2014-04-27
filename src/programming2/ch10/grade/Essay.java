@@ -1,3 +1,9 @@
+/**
+ * Chapter 10 Programming Challenges 4.
+ * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
+ * @version Apr 25, 2014
+ */
+
 /*
                                  UML
 -------------------------------------------------------------------------
@@ -17,17 +23,9 @@
 | - checkScore(scoreToCheck: double)                                    |
 -------------------------------------------------------------------------
  */
-
 package programming2.ch10.grade;
 
 
-
-
-/**
- *
- * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
- * @version Apr 25, 2014
- */
 public class Essay extends GradedActivity {
     private double grammar;
     private double spelling;
