@@ -87,7 +87,7 @@ public class Essay extends GradedActivity {
      * @param scoreToCheck the input score to check
      * @return the same input score
      */
-    public double checkScore(double scoreToCheck) {
+    private double checkScore(double scoreToCheck) {
         if(scoreToCheck > 100) {
             throw new IllegalArgumentException("A score cannot be higher than "
                     + "100");
