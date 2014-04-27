@@ -1,39 +1,74 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package programming2.ch10.grade;
-
 /**
- *
+ * Chapter 10 Programming Challenges 5.
  * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
  * @version Apr 26, 2014
  */
+
+/*
+                           UML
+---------------------------------------------------------
+|                      CourseGrades                     |
+---------------------------------------------------------
+| - grades: GradedActivity[]                            |
+---------------------------------------------------------
+| + setLab(lab: GradedActivity): void                   |
+| + setPassFailExam(passFailExam: PassFailExam): void   |
+| + setEssay(essay: Essay): void                        |
+| + setFinalExam(finalExam: FinalExam): void            |
+| + toString(): String                                  |
+---------------------------------------------------------
+*/
+
+package programming2.ch10.grade;
+
+
 public class CourseGrades {
     private GradedActivity[] grades;
 
+    /**
+     * Default constructor to initialize CourseGrades class.
+     */
     public CourseGrades() {
         this.grades = new GradedActivity[4];
     }
     
+    /**
+     * Set the student's score for lab activity.
+     * @param lab student's score for lab activity
+     */
     public void setLab(GradedActivity lab) {
         grades[0] = lab;
     }
     
+    /**
+     * Set the student's score for pass/fail exam.
+     * @param passFailExam student's score for pass/fail exam.
+     */
     public void setPassFailExam(PassFailExam passFailExam) {
         grades[1] = passFailExam;
     }
     
+    /**
+     * Set the student's score for the essay.
+     * @param essay student's score for the essay
+     */
     public void setEssay(Essay essay) {
         grades[2] = essay;
     }
     
+    /**
+     * Set the student's score for the final exam.
+     * @param finalExam student's score for the final exam
+     */
     public void setFinalExam(FinalExam finalExam) {
         grades[3] = finalExam;
     }
 
+    /**
+     * Return a string representation of this CourseGrades instance. Displaying
+     * the student's score the the lab, pass/fail exam, essay and final exam.
+     * @return string representation of the student's course grade
+     */
     @Override
     public String toString() {
         int ws = -22;
