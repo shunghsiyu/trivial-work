@@ -9,7 +9,7 @@ package programming2.ch10.pet;
 import java.util.ArrayList;
 
 /**
- *
+ * AP Pet
  * @author Shung-Hsi Yu <syu07@nyit.edu> ID#0906172
  * @version Apr 27, 2014
  */
