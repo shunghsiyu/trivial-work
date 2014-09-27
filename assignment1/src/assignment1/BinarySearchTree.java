@@ -6,7 +6,7 @@ public class BinarySearchTree {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void insert() {
+	public void insert(int value) {
 		// TODO implement
 	}
 	

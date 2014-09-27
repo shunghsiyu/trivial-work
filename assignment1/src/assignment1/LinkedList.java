@@ -6,7 +6,7 @@ public class LinkedList {
 		// TODO implement
 	}
 
-	public void insert() {
+	public void insert(int value) {
 		// TODO implement
 	}
 	
