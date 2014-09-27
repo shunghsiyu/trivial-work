@@ -17,7 +17,7 @@ public class Tester {
 		testLinkedList();
 		System.out.println();
 	}
-	
+
 	static void testBinarySearchTree() {
 		Random r = new Random();
 		double startTime = 0;
@@ -32,16 +32,26 @@ public class Tester {
 			for (int tries = 0; tries < EXP_NUM_TRIALS; tries++) {
 				BinarySearchTree bTree = new BinarySearchTree();
 				
+				int[] insertValues = new int[n];
+				for (int i = 0; i < n; i++) {
+					insertValues[i] = r.nextInt(MAX_VALUE);
+				}
+				
 				startTime = System.currentTimeMillis();
 				for (int i = 0; i < n; i++) {
-					bTree.insert(r.nextInt(MAX_VALUE));
+					bTree.insert(insertValues[i]);
 				}
 				endTime = System.currentTimeMillis();
 				totalInsertTime = totalInsertTime + (endTime - startTime);
 
+				int[] findValues = new int[FIND_TRIES];
+				for (int i = 0; i < FIND_TRIES; i++) {
+					findValues[i] = r.nextInt(MAX_VALUE);
+				}
+				
 				startTime = System.currentTimeMillis();
 				for (int i = 0; i < FIND_TRIES; i++) {
-					bTree.find(r.nextInt(MAX_VALUE));
+					bTree.find(findValues[i]);
 				}
 				endTime = System.currentTimeMillis();
 				totalFindTime = totalFindTime + (endTime - startTime);
@@ -67,16 +77,26 @@ public class Tester {
 			for (int tries = 0; tries < EXP_NUM_TRIALS; tries++) {
 				LinkedList ll = new LinkedList();
 				
+				int[] insertValues = new int[n];
+				for (int i = 0; i < n; i++) {
+					insertValues[i] = r.nextInt(MAX_VALUE);
+				}
+				
 				startTime = System.currentTimeMillis();
 				for (int i = 0; i < n; i++) {
-					ll.insert(r.nextInt(MAX_VALUE));
+					ll.insert(insertValues[i]);
 				}
 				endTime = System.currentTimeMillis();
 				totalInsertTime = totalInsertTime + (endTime - startTime);
 
+				int[] findValues = new int[FIND_TRIES];
+				for (int i = 0; i < FIND_TRIES; i++) {
+					findValues[i] = r.nextInt(MAX_VALUE);
+				}
+				
 				startTime = System.currentTimeMillis();
 				for (int i = 0; i < FIND_TRIES; i++) {
-					ll.find(r.nextInt(MAX_VALUE));
+					ll.find(findValues[i]);
 				}
 				endTime = System.currentTimeMillis();
 				totalFindTime = totalFindTime + (endTime - startTime);
@@ -87,5 +107,5 @@ public class Tester {
 							/ EXP_NUM_TRIALS);
 		}
 	}
-	
+
 }
