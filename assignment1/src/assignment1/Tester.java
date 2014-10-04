@@ -10,7 +10,7 @@ public class Tester {
 
 	public static void main(String[] args) {
 		System.out.println("Binary search tree:");
-		testBinarySearchTree();
+		//testBinarySearchTree();
 		System.out.println();
 		
 		System.out.println("List:");
