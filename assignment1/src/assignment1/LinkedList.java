@@ -8,6 +8,7 @@ class ListNode{
 		next=null;
 	}
 }
+
 public class LinkedList {
 	ListNode dummy=new ListNode(0);
 	ListNode node=dummy;
