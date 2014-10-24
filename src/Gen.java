@@ -40,10 +40,12 @@ public class Gen {
 		try {
 			FileOutputStream privateKeyOutput = new FileOutputStream(PRIVATE_KEY_FILENAME);
 			FileOutputStream publicKeyOutput = new FileOutputStream(PUBLIC_KEY_FILENAME);
-			X509EncodedKeySpec X509 = new X509EncodedKeySpec(publicKey.getEncoded());
-			privateKeyOutput.write(X509.getEncoded());
-			PKCS8EncodedKeySpec PKCS8 = new PKCS8EncodedKeySpec(privateKey.getEncoded());
-			publicKeyOutput.write(PKCS8.getEncoded());
+			X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
+			PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+			publicKeyOutput.write(publicKeySpec.getEncoded());
+			privateKeyOutput.write(privateKeySpec.getEncoded());
+			privateKeyOutput.close();
+			publicKeyOutput.close();
 		} catch (IOException e) {
 			System.out.println("Can't write key to disk");
 		}
