@@ -1,4 +1,6 @@
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -6,10 +8,8 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import javax.crypto.KeyGenerator;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Gen {
@@ -34,8 +34,20 @@ public class Gen {
 		PrivateKey privateKey = keyPair.getPrivate();
 		PublicKey publicKey = keyPair.getPublic();
 
-		System.out.println(toHex(publicKey.getEncoded()));
-		System.out.println(toHex(privateKey.getEncoded()));
+		String privateKeyFileName = "private";
+		String publicKeyFileName = "public";
+		try {
+			FileOutputStream privateKeyOutput = new FileOutputStream(privateKeyFileName);
+			FileOutputStream publicKeyOutput = new FileOutputStream(publicKeyFileName);
+			X509EncodedKeySpec X509 = new X509EncodedKeySpec(publicKey.getEncoded());
+			privateKeyOutput.write(X509.getEncoded());
+			PKCS8EncodedKeySpec PKCS8 = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+			publicKeyOutput.write(PKCS8.getEncoded());
+		} catch (IOException e) {
+			System.out.println("Can't write key to disk");
+		}
+		
+		
 	}
     
 	public static String toHex(byte[] data) {
