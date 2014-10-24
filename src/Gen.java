@@ -17,7 +17,6 @@ public class Gen {
 	public static final String ALGORITHM = "RSA";
 	public static final String PUBLIC_KEY_FILENAME = "public";
 	public static final String PRIVATE_KEY_FILENAME = "private";
-	private static final String DIGITS = "0123456789abcdef";
 	
     public static void main(String[] args) {
 		Security.addProvider(new BouncyCastleProvider());
@@ -49,26 +48,6 @@ public class Gen {
 		} catch (IOException e) {
 			System.out.println("Can't write key to disk");
 		}
-		
-		
+			
 	}
-    
-	public static String toHex(byte[] data) {
-		return toHex(data, data.length);
-	}
-	
-	public static String toHex(byte[] data, int length)
-    {
-        StringBuffer	buf = new StringBuffer();
-        
-        for (int i = 0; i != length; i++)
-        {
-            int	v = data[i] & 0xff;
-            
-            buf.append(DIGITS.charAt(v >> 4));
-            buf.append(DIGITS.charAt(v & 0xf));
-        }
-        
-        return buf.toString();
-    }
 }
