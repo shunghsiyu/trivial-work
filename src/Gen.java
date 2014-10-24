@@ -10,23 +10,26 @@ import java.security.PublicKey;
 import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Gen {
+	public static final String ALGORITHM = "RSA";
+	public static final String PUBLIC_KEY_FILENAME = "public";
+	public static final String PRIVATE_KEY_FILENAME = "private";
 	private static final String DIGITS = "0123456789abcdef";
 	
     public static void main(String[] args) {
 		Security.addProvider(new BouncyCastleProvider());
 		Provider bc = Security.getProvider("BC");
 		
-		String algorithm = "RSA";
 		int keysize = 1024;
 		KeyPairGenerator kg = null;
 		try {
-			kg = KeyPairGenerator.getInstance(algorithm, bc);
+			kg = KeyPairGenerator.getInstance(ALGORITHM, bc);
 			kg.initialize(keysize);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find algorithm " + algorithm);
+			System.out.println("Can't find algorithm " + ALGORITHM);
 			System.exit(-1);
 		}
 		
@@ -34,11 +37,9 @@ public class Gen {
 		PrivateKey privateKey = keyPair.getPrivate();
 		PublicKey publicKey = keyPair.getPublic();
 
-		String privateKeyFileName = "private";
-		String publicKeyFileName = "public";
 		try {
-			FileOutputStream privateKeyOutput = new FileOutputStream(privateKeyFileName);
-			FileOutputStream publicKeyOutput = new FileOutputStream(publicKeyFileName);
+			FileOutputStream privateKeyOutput = new FileOutputStream(PRIVATE_KEY_FILENAME);
+			FileOutputStream publicKeyOutput = new FileOutputStream(PUBLIC_KEY_FILENAME);
 			X509EncodedKeySpec X509 = new X509EncodedKeySpec(publicKey.getEncoded());
 			privateKeyOutput.write(X509.getEncoded());
 			PKCS8EncodedKeySpec PKCS8 = new PKCS8EncodedKeySpec(privateKey.getEncoded());
