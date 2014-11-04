@@ -74,31 +74,21 @@ public class My5Heap {
 			//find the max in the children
 			//if the last onde's children number less than 5
 			if(hole*5+5>next-1){
-				for(int j=child;j<next-1;j++){
-					if(priorityArray[j]<priorityArray[j+1]){
-						cmax= (cmax>priorityArray[j+1]?cmax:priorityArray[j+1]);
-							if(cmax==priorityArray[j+1])
-								cindex=j+1;
-					}
-					else if(priorityArray[j]>priorityArray[j+1]){
-						cmax=cmax>priorityArray[j]?cmax:priorityArray[j];
-							if(cmax==priorityArray[j])
-								cindex=j;
+				cindex = child;
+				cmax = priorityArray[cindex];
+				for(int i=child+1;i<=next-1;i++){
+					if(priorityArray[i]>cmax){
+						cindex = i;
 					}
 				}
 			}
 			else{
 				//find max between child, and its index
-				for(int i=child;i<child+4;i++){
-					if(priorityArray[i]<priorityArray[i+1]){
-						cmax=cmax>priorityArray[i+1]?cmax:priorityArray[i+1];
-							if(cmax==priorityArray[i+1])
-								cindex=i+1;
-					}
-					else if(priorityArray[i]>priorityArray[i+1]){
-						cmax=cmax>priorityArray[i]?cmax:priorityArray[i];
-							if(cmax==priorityArray[i])
-								cindex=i;
+				cindex = child;
+				cmax = priorityArray[child];
+				for(int i=child+1;i<=child+4;i++){
+					if(priorityArray[i]>cmax){
+						cindex = i;
 					}
 				}
 			} 
