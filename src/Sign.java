@@ -23,6 +23,7 @@ public class Sign {
 		s.initialize(Values.PRIVATE_KEY_FILENAME);
 		s.sign(Values.MESSAGE_FILENAME);
 		s.writeSignatureTo(Values.SIGNATURE_FILENAME);
+		System.out.println("File signed");
 	}
 
 	/* ----- Class Definition ----- */
@@ -160,7 +161,7 @@ public class Sign {
 
 		File signatureFile = new File(filename);
 		try (FileOutputStream signatureOutput = new FileOutputStream(
-				signatureFile)) {
+				signatureFile, false)) {
 			signatureOutput.write(digitalSignature);
 		} catch (IOException e) {
 			System.out.println("Can't write to signature file "

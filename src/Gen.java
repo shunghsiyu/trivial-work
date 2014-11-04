@@ -21,6 +21,7 @@ public class Gen {
 		gen.initialize();
 		gen.writePublicKey(Values.PUBLIC_KEY_FILENAME);
 		gen.writePrivateKey(Values.PRIVATE_KEY_FILENAME);
+		System.out.println("Key Generated!");
 	}
 
 	/* ----- Class Definition ----- */
@@ -58,6 +59,7 @@ public class Gen {
 		KeyPair keyPair = kg.generateKeyPair();
 		privateKey = keyPair.getPrivate();
 		publicKey = keyPair.getPublic();
+		initialized = true;
 	}
 
 	/**
@@ -122,7 +124,7 @@ public class Gen {
 	 *            the KeySpec object to be written to disk
 	 */
 	private void writeKeySpecs(String filename, EncodedKeySpec keySpec) {
-		try (FileOutputStream keyOutput = new FileOutputStream(filename)) {
+		try (FileOutputStream keyOutput = new FileOutputStream(filename, false)) {
 			keyOutput.write(keySpec.getEncoded());
 		} catch (IOException e) {
 			System.out.println("Can't write to file " + filename);
