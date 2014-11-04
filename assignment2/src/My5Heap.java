@@ -2,16 +2,19 @@ public class My5Heap {
 	private int[] priorityArray;
 	private String[] valueArray;
 	private int next;
-	int size;
 
 	public My5Heap(int size) {
-		this.size = size;
 		priorityArray = new int[size];
 		valueArray = new String[size];
 		next = 0;
 	}
 
 	public void insert(int priority, String value) {
+		if (isFull()) {
+			// Overflow
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		
 		priorityArray[next] = priority;
 		valueArray[next] = value;
 		int pos = next;
@@ -37,10 +40,19 @@ public class My5Heap {
 	}
 
 	public boolean isFull() {
-		return (next >= priorityArray.length - 1);
+		return (next > priorityArray.length - 1);
+	}
+	
+	public boolean isEmpty() {
+		return (next <= 0);
 	}
 
 	public String deleteMax() {
+		if(isEmpty()) {
+			// Underflow
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		
 		// the root value
 		String str = valueArray[0];
 
