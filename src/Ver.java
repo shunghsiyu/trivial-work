@@ -17,30 +17,25 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 
 public class Ver {
-	public static final String KEY_ALGORITHM = Gen.ALGORITHM;
-	public static final String SIGN_ALGORITHM = Sign.SIGN_ALGORITHM;
-	public static final String PUBLIC_KEY_FILENAME = Gen.PUBLIC_KEY_FILENAME;
-	public static final String SIGNATURE_FILENAME = Sign.SIGNATURE_FILENAME;
-	
 	public static void main(String[] args) {
 		Security.addProvider(new BouncyCastleProvider());
 		Provider bc = Security.getProvider("BC");
 		
 		byte[] data = null;
 		try {
-			Path path = Paths.get(PUBLIC_KEY_FILENAME);
+			Path path = Paths.get(Values.PUBLIC_KEY_FILENAME);
 			data = Files.readAllBytes(path);
 		} catch (IOException e) {
-			System.out.println("Can't read public key " + PUBLIC_KEY_FILENAME + " from disk");
+			System.out.println("Can't read public key " + Values.PUBLIC_KEY_FILENAME + " from disk");
 			System.exit(-1);
 		}
 		
 		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(data);
 		KeyFactory keyFactory = null;
 		try {
-			keyFactory = KeyFactory.getInstance(KEY_ALGORITHM, bc);
+			keyFactory = KeyFactory.getInstance(Values.ALGORITHM, bc);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find key algorithm " + KEY_ALGORITHM);
+			System.out.println("Can't find key algorithm " + Values.ALGORITHM);
 			System.exit(-1);
 		}
 		
@@ -48,23 +43,23 @@ public class Ver {
 		Signature signer = null;
 		try {
 			publicKey = keyFactory.generatePublic(publicKeySpec);
-			signer = Signature.getInstance(SIGN_ALGORITHM, bc);
+			signer = Signature.getInstance(Values.SIGN_ALGORITHM, bc);
 			signer.initVerify(publicKey);
 		} catch (InvalidKeyException | InvalidKeySpecException e) {
-			System.out.println("Input data from " + PUBLIC_KEY_FILENAME + " is invalid");
+			System.out.println("Input data from " + Values.PUBLIC_KEY_FILENAME + " is invalid");
 			e.printStackTrace();
 			System.exit(-1);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find signature algorithm " + SIGN_ALGORITHM);
+			System.out.println("Can't find signature algorithm " + Values.SIGN_ALGORITHM);
 			System.exit(-1);
 		}
 		
 		byte[] messageData = null;
 		byte[] digitalSignature = null;
 		try {
-			Path path = Paths.get(Sign.MESSAGE_FILENAME);
+			Path path = Paths.get(Values.MESSAGE_FILENAME);
 			messageData = Files.readAllBytes(path);
-			path = Paths.get(Sign.SIGNATURE_FILENAME);
+			path = Paths.get(Values.SIGNATURE_FILENAME);
 			digitalSignature = Files.readAllBytes(path);
 			signer.update(messageData);
 			boolean valid = signer.verify(digitalSignature);
@@ -78,7 +73,7 @@ public class Ver {
 			e.printStackTrace();
 			System.exit(-1);
 		} catch (IOException e) {
-			System.out.println("Can't read message file " + Sign.MESSAGE_FILENAME);
+			System.out.println("Can't read message file " + Values.MESSAGE_FILENAME);
 			e.printStackTrace();
 			System.exit(-1);
 		}

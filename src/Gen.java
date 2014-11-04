@@ -14,23 +14,17 @@ import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Gen {
-	public static final String ALGORITHM = "RSA";
-	public static final String PUBLIC_KEY_FILENAME = "public";
-	public static final String PRIVATE_KEY_FILENAME = "private";
-	public static final int KEYSIZE = 1024;
-
 	/* ----- Main Method ----- */
 
 	public static void main(String[] args) {
-		Gen gen = new Gen(ALGORITHM, KEYSIZE);
+		Gen gen = new Gen(Values.ALGORITHM, Values.KEYSIZE);
 		gen.initialize();
-		gen.writePublicKey(PUBLIC_KEY_FILENAME);
-		gen.writePrivateKey(PRIVATE_KEY_FILENAME);
+		gen.writePublicKey(Values.PUBLIC_KEY_FILENAME);
+		gen.writePrivateKey(Values.PRIVATE_KEY_FILENAME);
 	}
 
 	/* ----- Class Definition ----- */
 
-	public static final String PROVIDER = "BC";
 	private boolean initialized;
 	private String algorithm;
 	private int keysize;
@@ -50,7 +44,7 @@ public class Gen {
 		this.initialized = false;
 		this.algorithm = algorithm;
 		this.keysize = keysize;
-		this.provider = PROVIDER;
+		this.provider = Values.PROVIDER;
 	}
 
 	/**
