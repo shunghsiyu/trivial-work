@@ -41,23 +41,16 @@ public class My5Heap {
 	}
 
 	public String deleteMax() {
-		double max = 0;// the root value
-		String str = "";
+		double max = priorityArray[0];// the root value
+		String str = valueArray[0];
 
-		// the last hole
-		double lastVal = priorityArray[next - 1];
-		String lastStr = valueArray[next - 1];
-
-		// the max node
-		max = priorityArray[0];
-		str = valueArray[0];
+		swap(0, next - 1);
 
 		// delete the max
-		priorityArray[0] = lastVal;
-		valueArray[0] = lastStr;
+		priorityArray[next - 1] = 0.0;
+		valueArray[next - 1] = null;
 
 		percolateDown(0);
-
 		next = next - 1;
 
 		return max + "\t" + str;
@@ -65,18 +58,7 @@ public class My5Heap {
 
 	public void percolateDown(int hole) {
 		while (hole * 5 + 1 < next) {
-			int firstChild = hole * 5 + 1;
-			// find the max in the children
-			int maxChildIndex = hole * 5 + 1;
-			// if the last onde's children number less than 5
-			int lastChild = (firstChild + 4 > next - 1) ? next - 1
-					: firstChild + 4;
-			
-			for (int i = firstChild + 1; i <= lastChild; i++) {
-				if (priorityArray[i] > priorityArray[maxChildIndex]) {
-					maxChildIndex = i;
-				}
-			}
+			int maxChildIndex = maxChildrenOf(hole);
 			// swap nodes
 			if (priorityArray[maxChildIndex] > priorityArray[hole]) {
 				swap(maxChildIndex, hole);
@@ -86,4 +68,19 @@ public class My5Heap {
 		}
 	}
 
+	private int maxChildrenOf(int parent) {
+		int firstChild = parent * 5 + 1;
+		// find the max in the children
+		int maxChildIndex = parent * 5 + 1;
+		// if the last onde's children number less than 5
+		int lastChild = (firstChild + 4 > next - 1) ? next - 1
+				: firstChild + 4;
+		
+		for (int i = firstChild + 1; i <= lastChild; i++) {
+			if (priorityArray[i] > priorityArray[maxChildIndex]) {
+				maxChildIndex = i;
+			}
+		}
+		return maxChildIndex;
+	}
 }
