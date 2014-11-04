@@ -1,6 +1,6 @@
 
 public class Values {
-	public static final String ALGORITHM = "RSA";
+	public static final String KEY_ALGORITHM = "RSA";
 	public static final String PUBLIC_KEY_FILENAME = "public";
 	public static final String PRIVATE_KEY_FILENAME = "private";
 	public static final int KEYSIZE = 1024;

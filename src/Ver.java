@@ -33,9 +33,9 @@ public class Ver {
 		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(data);
 		KeyFactory keyFactory = null;
 		try {
-			keyFactory = KeyFactory.getInstance(Values.ALGORITHM, bc);
+			keyFactory = KeyFactory.getInstance(Values.KEY_ALGORITHM, bc);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find key algorithm " + Values.ALGORITHM);
+			System.out.println("Can't find key algorithm " + Values.KEY_ALGORITHM);
 			System.exit(-1);
 		}
 		

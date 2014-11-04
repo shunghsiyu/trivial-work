@@ -17,7 +17,7 @@ public class Gen {
 	/* ----- Main Method ----- */
 
 	public static void main(String[] args) {
-		Gen gen = new Gen(Values.ALGORITHM, Values.KEYSIZE);
+		Gen gen = new Gen(Values.KEY_ALGORITHM, Values.KEYSIZE);
 		gen.initialize();
 		gen.writePublicKey(Values.PUBLIC_KEY_FILENAME);
 		gen.writePrivateKey(Values.PRIVATE_KEY_FILENAME);
@@ -26,7 +26,7 @@ public class Gen {
 	/* ----- Class Definition ----- */
 
 	private boolean initialized;
-	private String algorithm;
+	private String keyAlgorithm;
 	private int keysize;
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
@@ -35,14 +35,14 @@ public class Gen {
 	/**
 	 * Constructor of Gen class.
 	 * 
-	 * @param algorithm
+	 * @param keyAlgorithm
 	 *            the algorithm used to generate the key pair
 	 * @param keysize
 	 *            the size of the key
 	 */
-	public Gen(String algorithm, int keysize) {
+	public Gen(String keyAlgorithm, int keysize) {
 		this.initialized = false;
-		this.algorithm = algorithm;
+		this.keyAlgorithm = keyAlgorithm;
 		this.keysize = keysize;
 		this.provider = Values.PROVIDER;
 	}
@@ -69,10 +69,10 @@ public class Gen {
 	private KeyPairGenerator getKeyPairGenerator() {
 		KeyPairGenerator kg = null;
 		try {
-			kg = KeyPairGenerator.getInstance(algorithm, provider);
+			kg = KeyPairGenerator.getInstance(keyAlgorithm, provider);
 			kg.initialize(keysize);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find algorithm " + algorithm);
+			System.out.println("Can't find algorithm " + keyAlgorithm);
 			System.exit(-1);
 		} catch (NoSuchProviderException e) {
 			System.out.println("Can't find provider " + provider);
