@@ -46,8 +46,8 @@ public class My5Heap {
 		String str="";
 		
 			//the last hole
-			double lastVal=priorityArray[--size];
-			String lastStr=valueArray[--size];
+			double lastVal=priorityArray[next - 1];
+			String lastStr=valueArray[next - 1];
 		
 			//the max node 
 			max=priorityArray[0];
@@ -59,6 +59,8 @@ public class My5Heap {
 
 			per_Down(0);
 		
+			next = next - 1;
+			
 		return max+"\t"+str;
 	}
 	
@@ -67,12 +69,12 @@ public class My5Heap {
 		int cindex=0;
 		double cmax=0;
 		
-		for(;hole*5+1<size;){
+		while(hole*5+1<next){
 			child=hole*5+1;
 			//find the max in the children
 			//if the last onde's children number less than 5
-			if(hole*5+5>size-1){
-				for(int j=child;j<size-1;j++){
+			if(hole*5+5>next-1){
+				for(int j=child;j<next-1;j++){
 					if(priorityArray[j]<priorityArray[j+1]){
 						cmax= (cmax>priorityArray[j+1]?cmax:priorityArray[j+1]);
 							if(cmax==priorityArray[j+1])
@@ -102,12 +104,7 @@ public class My5Heap {
 			} 
 			//swap nodes
 			if(priorityArray[cindex]>priorityArray[hole]){
-				double temp=priorityArray[cindex];
-				priorityArray[cindex]=priorityArray[hole];
-				priorityArray[hole]=temp;
-				String tempValue=valueArray[cindex];
-				valueArray[cindex]=valueArray[hole];
-				valueArray[hole]=tempValue;
+				swap(cindex, hole);
 			}
 			else break;
 			hole=cindex;
