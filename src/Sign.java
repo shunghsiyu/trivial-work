@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.Signature;
@@ -76,20 +74,13 @@ public class Sign {
 	 */
 	private PrivateKey readPrivateKeyFrom(String filename) {
 		PrivateKey key = null;
+		KeyFactory keyFactory = Utils.getKeyFactoryInstance(keyAlgorithm, provider);
 		try {
 			Path path = Paths.get(filename);
 			byte[] privateKeyData = Files.readAllBytes(path);
 			PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
 					privateKeyData);
-			KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm,
-					provider);
 			key = keyFactory.generatePrivate(privateKeySpec);
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find key algorithm " + keyAlgorithm);
-			System.exit(-1);
-		} catch (NoSuchProviderException e) {
-			System.out.println("Can't find provider " + provider);
-			System.exit(-1);
 		} catch (InvalidKeySpecException e) {
 			System.out.println("Input data from " + filename + " is invalid");
 			e.printStackTrace();
@@ -110,20 +101,11 @@ public class Sign {
 	 * @return a signature instance that can be used for signing
 	 */
 	private Signature prepareAndGetSigner() {
-		Signature signature = null;
+		Signature signature = Utils.getSignatureInstance(signAlgorithm, provider);
 		try {
-			signature = Signature.getInstance(signAlgorithm, provider);
 			signature.initSign(privateKey);
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Can't find signature algorithm "
-					+ signAlgorithm);
-			System.exit(-1);
-		} catch (NoSuchProviderException e) {
-			System.out.println("Can't find provider " + provider);
-			System.exit(-1);
 		} catch (InvalidKeyException e) {
 			System.out.println("Input private key is invalid");
-			e.printStackTrace();
 			System.exit(-1);
 		}
 		return signature;
