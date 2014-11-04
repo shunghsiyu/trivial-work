@@ -1,17 +1,17 @@
 public class My5Heap {
-	private double[] priorityArray;
+	private int[] priorityArray;
 	private String[] valueArray;
 	private int next;
 	int size;
 
 	public My5Heap(int size) {
 		this.size = size;
-		priorityArray = new double[size];
+		priorityArray = new int[size];
 		valueArray = new String[size];
 		next = 0;
 	}
 
-	public void insert(double priority, String value) {
+	public void insert(int priority, String value) {
 		priorityArray[next] = priority;
 		valueArray[next] = value;
 		int pos = next;
@@ -28,7 +28,7 @@ public class My5Heap {
 	}
 
 	public void swap(int pos1, int pos2) {
-		double tempPriority = priorityArray[pos1];
+		int tempPriority = priorityArray[pos1];
 		String tempValue = valueArray[pos1];
 		priorityArray[pos1] = priorityArray[pos2];
 		valueArray[pos1] = valueArray[pos2];
@@ -41,19 +41,19 @@ public class My5Heap {
 	}
 
 	public String deleteMax() {
-		double max = priorityArray[0];// the root value
+		// the root value
 		String str = valueArray[0];
 
 		swap(0, next - 1);
 
 		// delete the max
-		priorityArray[next - 1] = 0.0;
+		priorityArray[next - 1] = 0;
 		valueArray[next - 1] = null;
 
 		percolateDown(0);
 		next = next - 1;
 
-		return max + "\t" + str;
+		return str;
 	}
 
 	public void percolateDown(int hole) {
