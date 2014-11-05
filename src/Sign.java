@@ -1,5 +1,5 @@
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +12,10 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -34,7 +38,7 @@ public class Sign {
 	private String signAlgorithm;
 	private PrivateKey privateKey;
 	private Signature signer;
-	byte[] digitalSignature;
+	private Map<String, String> map;
 
 	/**
 	 * Constructor of Sign class.
@@ -51,7 +55,7 @@ public class Sign {
 		this.initalized = false;
 		this.keyAlgorithm = keyAlgorithm;
 		this.signAlgorithm = signAlgorithm;
-		this.digitalSignature = null;
+		this.map = new LinkedHashMap<>();
 	}
 
 	/**
@@ -63,6 +67,7 @@ public class Sign {
 	public void initialize(String privateKeyFilename) {
 		privateKey = readPrivateKeyFrom(privateKeyFilename);
 		signer = prepareAndGetSigner();
+		map.clear();
 		this.initalized = true;
 	}
 
@@ -75,7 +80,8 @@ public class Sign {
 	 */
 	private PrivateKey readPrivateKeyFrom(String filename) {
 		PrivateKey key = null;
-		KeyFactory keyFactory = Utils.getKeyFactoryInstance(keyAlgorithm, provider);
+		KeyFactory keyFactory = Utils.getKeyFactoryInstance(keyAlgorithm,
+				provider);
 		try {
 			Path path = Paths.get(filename);
 			byte[] privateKeyData = Files.readAllBytes(path);
@@ -102,7 +108,8 @@ public class Sign {
 	 * @return a signature instance that can be used for signing
 	 */
 	private Signature prepareAndGetSigner() {
-		Signature signature = Utils.getSignatureInstance(signAlgorithm, provider);
+		Signature signature = Utils.getSignatureInstance(signAlgorithm,
+				provider);
 		try {
 			signature.initSign(privateKey);
 		} catch (InvalidKeyException e) {
@@ -113,34 +120,62 @@ public class Sign {
 	}
 
 	/**
-	 * Sign a file with the specified filename. Must call initialize() to to
-	 * associate this instance before this method is called.
+	 * Sign all the files that can be found under a specified file path. Must
+	 * call initialize() to to associate this instance before this method is
+	 * called.
 	 * 
-	 * @param filename
-	 *            the filename of the file that was to be signed
+	 * @param filepath
+	 *            the path of the file/directory that was to be signed
 	 * @return the digital signature of the specified file
 	 */
-	public byte[] sign(String filename) {
+	public void sign(String filepath) {
 		if (!initalized) {
 			throw new IllegalStateException("Must initialize first!");
 		}
 
-		try {
-			Path path = Paths.get(filename);
-			byte[] messageData = Files.readAllBytes(path);
-			signer.update(messageData);
-			this.digitalSignature = signer.sign();
-		} catch (SignatureException e) {
-			System.out.println("Can't sign the message");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (IOException e) {
-			System.out.println("Can't read message file " + filename);
-			e.printStackTrace();
-			System.exit(-1);
+		SignWalk walker = new SignWalk(filepath);
+		walker.walk();
+	}
+
+	/**
+	 * Utility class to walk the directory tree. Calculate signature for all
+	 * file it encountered and add it to the map of this Sign instance.
+	 *
+	 */
+	private class SignWalk extends Utils.FileWalker {
+		/**
+		 * Constructor of SignWalk class.
+		 * 
+		 * @param filepath
+		 *            the start path for walking the directory tree
+		 */
+		public SignWalk(String filepath) {
+			super(filepath);
 		}
 
-		return digitalSignature.clone();
+		@Override
+		void work(String relativePath) {
+			String realPath = relativePath.substring(1);
+			File file = new File(realPath);
+			Path fileToRead = Paths.get(file.getAbsolutePath());
+			byte[] digitalSignature = null;
+			try {
+				byte[] messageData = Files.readAllBytes(fileToRead);
+				signer.update(messageData);
+				digitalSignature = signer.sign();
+			} catch (SignatureException e) {
+				System.out.println("Can't sign the message");
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (IOException e) {
+				System.out.println("Can't read message file "
+						+ file.getAbsolutePath());
+				e.printStackTrace();
+				System.exit(-1);
+			}
+			String signatureInHex = Utils.byteArrayToHex(digitalSignature);
+			map.put(realPath, signatureInHex);
+		}
 	}
 
 	/**
@@ -148,21 +183,28 @@ public class Sign {
 	 * initialize() and sign() before calling this method.
 	 * 
 	 * @param filename
-	 *            the filename of file to which the digital signature will be
-	 *            written
+	 *            the filename of file to which all the digital signatures will
+	 *            be written
 	 */
 	public void writeSignatureTo(String filename) {
 		if (!initalized) {
 			throw new IllegalStateException("Must initialize first!");
-		} else if (digitalSignature == null) {
+		} else if (map.isEmpty()) {
 			throw new IllegalStateException(
 					"The signature hasn't been generated yet!");
 		}
 
 		File signatureFile = new File(filename);
-		try (FileOutputStream signatureOutput = new FileOutputStream(
-				signatureFile, false)) {
-			signatureOutput.write(digitalSignature);
+		try (FileWriter signatureOutput = new FileWriter(signatureFile, false)) {
+			Iterator<Entry<String, String>> it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, String> entry = it.next();
+				signatureOutput.write("\"");
+				signatureOutput.write(entry.getKey());
+				signatureOutput.write("\" ");
+				signatureOutput.write(entry.getValue());
+				signatureOutput.write("\n");
+			}
 		} catch (IOException e) {
 			System.out.println("Can't write to signature file "
 					+ signatureFile.getAbsolutePath());

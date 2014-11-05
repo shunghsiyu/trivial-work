@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +12,9 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -33,6 +38,7 @@ public class Ver {
 	private String signAlgorithm;
 	private PublicKey publicKey;
 	private Signature verifier;
+	private Map<String, String> map;
 
 	/**
 	 * Constructor of Ver class.
@@ -40,12 +46,13 @@ public class Ver {
 	 * @param keyAlgorithm
 	 *            the algorithm used for the generation of the public key
 	 * @param signAlgorithm
-	 *            the algorithm that will be used to sign the message
+	 *            the algorithm that was be used for signing
 	 */
 	public Ver(String keyAlgorithm, String signAlgorithm) {
 		super();
 		this.keyAlgorithm = keyAlgorithm;
 		this.signAlgorithm = signAlgorithm;
+		this.map = new HashMap<String, String>();
 		this.initalized = false;
 	}
 
@@ -61,6 +68,7 @@ public class Ver {
 		}
 		publicKey = readPrivateKeyFrom(publicKeyFilename);
 		verifier = prepareAndGetVerifier();
+		map.clear();
 		initalized = true;
 	}
 
@@ -110,38 +118,105 @@ public class Ver {
 	}
 
 	/**
-	 * Verify a message file with its signature.
+	 * Verify a file path with its signature. If the path points to a folder
+	 * then verify all the files inside it and its sub-directories.
 	 * 
-	 * @param messageFilename
-	 *            the filename of the message file
+	 * @param verifyFilepath
+	 *            the path of the file or folder to be verified
 	 * @param signatureFilename
-	 *            the filename of the file that stores the signature of the
-	 *            message file
+	 *            the filename of the file that stores the signature(s) of the
+	 *            file(s)
 	 * @return
 	 */
-	public boolean verify(String messageFilename, String signatureFilename) {
+	public boolean verify(String verifyFilepath, String signatureFilename) {
 		if (!initalized) {
 			throw new IllegalStateException(
 					"This Ver instance has not been initalized");
 		}
 
-		boolean valid = false;
-		try {
-			Path path = Paths.get(messageFilename);
-			byte[] messageData = Files.readAllBytes(path);
-			path = Paths.get(signatureFilename);
-			byte[] digitalSignature = Files.readAllBytes(path);
-			verifier.update(messageData);
-			valid = verifier.verify(digitalSignature);
-		} catch (SignatureException e) {
-			System.out.println("Can't verify the message");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (IOException e) {
-			System.out.println("Can't read message file " + messageFilename);
+		readInSignatures(signatureFilename);
+
+		VerWalker walker = new VerWalker(verifyFilepath);
+		walker.walk();
+		return walker.valid();
+	}
+
+	/**
+	 * Read all the file signatures from the specified file into map.
+	 * 
+	 * @param signatureFilename
+	 *            the name of the file that contains all the file signatures
+	 */
+	private void readInSignatures(String signatureFilename) {
+		try (Scanner in = new Scanner(new File(signatureFilename))) {
+			while (in.hasNext()) {
+				String temp = in.next();
+				String name = temp.substring(1, temp.length() - 1);
+				String signatureInHex = in.next();
+				map.put(name, signatureInHex);
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Can't find file " + signatureFilename);
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		return valid;
+	}
+
+	/**
+	 * Utility class to walk the directory tree. Verify all files it encountered
+	 * with corresponding signature in the map of this Ver instance.
+	 *
+	 */
+	private class VerWalker extends Utils.FileWalker {
+		private boolean findInvalid;
+
+		public VerWalker(String filepath) {
+			super(filepath);
+			findInvalid = false;
+		}
+
+		public boolean valid() {
+			return (!findInvalid);
+		}
+
+		@Override
+		void work(String relativePath) {
+			String realPath = relativePath.substring(1);
+			File file = new File(realPath);
+			boolean valid = false;
+			try {
+				Path path = Paths.get(file.getAbsolutePath());
+				byte[] messageData = Files.readAllBytes(path);
+				String digitalSignatureInHex = map.get(realPath);
+				if (digitalSignatureInHex == null) {
+					findInvalid = true;
+					System.out.println("\"" + file.getAbsolutePath()
+							+ "\": NO CORRESPONDING SIGNATURE");
+					return;
+				}
+				byte[] digitalSignature = Utils
+						.hexToByteArray(digitalSignatureInHex);
+				verifier.update(messageData);
+				valid = verifier.verify(digitalSignature);
+			} catch (SignatureException e) {
+				System.out.println("Can't verify the message");
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (IOException e) {
+				System.out.println("Can't read message file "
+						+ file.getAbsolutePath());
+				e.printStackTrace();
+				System.exit(-1);
+			}
+
+			System.out.print("\"" + file.getAbsolutePath() + "\": ");
+			if (!valid) {
+				System.out.println("INVALID");
+				findInvalid = true;
+			} else {
+				System.out.println("Valid");
+			}
+		}
+
 	}
 }
