@@ -2,11 +2,13 @@
 <meta charset="utf-8">
 <body> 
 <style>
-        .link {
+
+        .link line{
         stroke: #666;
         opacity: 0.6;
         stroke-width: 1.5px;
         }
+
         .node circle {
         stroke: #fff;
         opacity: 0.6;
@@ -19,7 +21,7 @@
         pointer-events: none;
         }
 
-        .d3-tip {
+        .d3-tip-node {
           line-height: 1;
           font-weight: bold;
           font: 12px sans-serif;
@@ -30,7 +32,7 @@
         }
 
         /* Creates a small triangle extender for the tooltip */
-        .d3-tip:after {
+        .d3-tip-node:after {
           box-sizing: border-box;
           display: inline;
           font-size: 10px;
@@ -43,7 +45,7 @@
         }
 
         /* Style northward tooltips differently */
-        .d3-tip.n:after {
+        .d3-tip-node.n:after {
           margin: -1px 0 0 0;
           top: 100%;
           left: 0;
@@ -128,39 +130,53 @@
     var width = 900
     var height = 600;
 
-    var tip = d3.tip()
-                .attr("class", "d3-tip")
+    var nodeTip = d3.tip()
+                .attr("class", "d3-tip-node")
                 .offset([-10, 0])
-                .html(function(d){return "Load: 51%";});
+                .html(function(d){return "Server load: 51%";});
+
+    var linkTip = d3.tip()
+                .attr("class", "d3-tip-link")
+                .offset([0, 0])
+                .html(function(d){return "This is a link";});
 
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
         .linkDistance(200)
-        .charge(0)
+        .friction(0.9)
+        .charge(-800)
         .on("tick", tick)
         .start();
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
-        .attr("height", height)
-        .call(tip);
+        .attr("height", height);
 
     var link = svg.selectAll(".link")
         .data(force.links())
-        .enter().append("line")
-        .attr("class", "link");
+        .enter().append("g")
+        .attr("class", "link")
+        .on("mouseover", linkOver)
+        .on("mouseout", linkOut)
+        .call(linkTip);
+
+    link.append("line");
+    link.append("line")
+        .style("opacity", "0")
+        .style("stroke-width", cRadiusDefault*2+"px");
 
     var node = svg.selectAll(".node")
         .data(force.nodes())
         .enter().append("g")
         .attr("class", "node")
-        .on("mouseover", nodeMouseOver)
-        .on("mouseout", nodeMouseOut)
+        .on("mouseover", nodeOver)
+        .on("mouseout", nodeOut)
         .on("click", nodeClick)
         .on("dblclick", nodeDbClick)
-        .call(force.drag);
+        .call(force.drag)
+        .call(nodeTip);
 
     node.append("circle")
         .attr("r", cRadiusDefault)
@@ -178,7 +194,7 @@
         });
 
     function tick() {
-        link
+        link.selectAll("line")
             .attr("x1", function(d) {
                 return d.source.x;
             })
@@ -197,7 +213,7 @@
         });
     }
 
-    function nodeMouseOver(d, i) {
+    function nodeOver(d, i) {
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorOver)
@@ -208,7 +224,7 @@
             .style("font", tFontOver);
     }
 
-    function nodeMouseOut(d, i) {
+    function nodeOut(d, i) {
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
@@ -220,10 +236,19 @@
     }
     
     function nodeClick(d, i) {
-            tip.show(d, i);
+        nodeTip.show(d, i);
     }
 
     function nodeDbClick(d, i) {
+        nodeTip.hide(d, i);
+    }
+
+    function linkOver(d, i) {
+        linkTip.show(d, i);
+    }
+
+    function linkOut(d, i) {
+        linkTip.hide(d, i);
     }
 </script>
 </body>
