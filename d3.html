@@ -2,25 +2,56 @@
 <meta charset="utf-8">
 <body> 
 <style>
-.link {
-stroke: #666;
-opacity: 0.6;
-stroke-width: 1.5px;
-}
-.node circle {
-stroke: #fff;
-opacity: 0.6;
-stroke-width: 1.5px;
-}
-text {
-font: 7px serif;
-opacity: 0.6;
-pointer-events: none;
-}
+        .link {
+        stroke: #666;
+        opacity: 0.6;
+        stroke-width: 1.5px;
+        }
+        .node circle {
+        stroke: #fff;
+        opacity: 0.6;
+        stroke-width: 1.5px;
+        }
+
+        text {
+        font: 12px sans-serif;
+        opacity: 0.6;
+        pointer-events: none;
+        }
+
+        .d3-tip {
+          line-height: 1;
+          font-weight: bold;
+          font: 12px sans-serif;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+          box-sizing: border-box;
+          display: inline;
+          font-size: 10px;
+          width: 100%;
+          line-height: 1;
+          color: rgba(0, 0, 0, 0.8);
+          content: "\25BC";
+          position: absolute;
+          text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
 </style>
 
 <script src=http://d3js.org/d3.v3.min.js></script>
-
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
     var dTransitionClicked = 750;
     var dTransitionOver = 200;
@@ -29,8 +60,8 @@ pointer-events: none;
     var cColorDefault = "seagreen";
     var cColorOver = "lawngreen";
     var tXMultiplier = 1.5;
-    var tFontDefault = "12px serif";
-    var tFontOver =  "20px serif";
+    var tFontDefault = "12px sans-serif";
+    var tFontOver =  "20px sans-serif";
 
     var links = [{
         "source": "Chicago",
@@ -97,18 +128,24 @@ pointer-events: none;
     var width = 900
     var height = 600;
 
+    var tip = d3.tip()
+                .attr("class", "d3-tip")
+                .offset([-10, 0])
+                .html(function(d){return "Load: 51%";});
+
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(100)
-        .charge(-200)
+        .linkDistance(200)
+        .charge(0)
         .on("tick", tick)
         .start();
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .call(tip);
 
     var link = svg.selectAll(".link")
         .data(force.links())
@@ -119,10 +156,10 @@ pointer-events: none;
         .data(force.nodes())
         .enter().append("g")
         .attr("class", "node")
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("click", click)
-        .on("dblclick", dblclick)
+        .on("mouseover", nodeMouseOver)
+        .on("mouseout", nodeMouseOut)
+        .on("click", nodeClick)
+        .on("dblclick", nodeDbClick)
         .call(force.drag);
 
     node.append("circle")
@@ -160,7 +197,7 @@ pointer-events: none;
         });
     }
 
-    function mouseover() {
+    function nodeMouseOver(d, i) {
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorOver)
@@ -171,7 +208,7 @@ pointer-events: none;
             .style("font", tFontOver);
     }
 
-    function mouseout() {
+    function nodeMouseOut(d, i) {
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
@@ -182,10 +219,11 @@ pointer-events: none;
             .attr("r", cRadiusDefault);
     }
     
-    function click() {
+    function nodeClick(d, i) {
+            tip.show(d, i);
     }
 
-    function dblclick() {
+    function nodeDbClick(d, i) {
     }
 </script>
- </body>
+</body>
