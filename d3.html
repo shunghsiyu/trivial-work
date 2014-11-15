@@ -13,7 +13,7 @@ opacity: 0.6;
 stroke-width: 1.5px;
 }
 text {
-font: 10px serif;
+font: 7px serif;
 opacity: 0.6;
 pointer-events: none;
 }
@@ -22,6 +22,16 @@ pointer-events: none;
 <script src=http://d3js.org/d3.v3.min.js></script>
 
 <script>
+    var dTransitionClicked = 750;
+    var dTransitionOver = 200;
+    var cRadiusDefault = 10;
+    var cRadiusOver = 16;
+    var cColorDefault = "seagreen";
+    var cColorOver = "lawngreen";
+    var tXMultiplier = 1.5;
+    var tFontDefault = "12px serif";
+    var tFontOver =  "20px serif";
+
     var links = [{
         "source": "Chicago",
         "target": "SF"
@@ -116,14 +126,15 @@ pointer-events: none;
         .call(force.drag);
 
     node.append("circle")
-        .attr("r", 8)
+        .attr("r", cRadiusDefault)
         .style("stroke", "black")
-        .style("fill", "seagreen")
+        .style("fill", cColorDefault)
         .style("stroke-width", "2px");
 
     node.append("text")
-        .attr("x", 12)
+        .attr("x", cRadiusDefault*tXMultiplier)
         .attr("dy", ".35em")
+        .style("font", tFontDefault)
         .style("fill", "black")
         .text(function(d) {
             return d.name;
@@ -151,44 +162,32 @@ pointer-events: none;
 
     function mouseover() {
         d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", 16);
+            .duration(dTransitionOver)
+            .style("fill", cColorOver)
+            .attr("r", cRadiusOver);
+        d3.select(this).select("text").transition()
+            .duration(dTransitionOver)
+            .attr("x", cRadiusOver*tXMultiplier)
+            .style("font", tFontOver);
     }
 
     function mouseout() {
-            d3.select(this).select("circle").transition()
-                .duration(750)
-                .attr("r", 8);
-        }
-        // action to take on mouse click
-    function click() {
         d3.select(this).select("text").transition()
-            .duration(750)
-            .attr("x", 22)
-            /*.style("stroke-width", ".5px")
-            .style("opacity", 1)
-            .style("fill", "#E34A33")*/
-            .style("font", "17.5px serif");
+            .duration(dTransitionOver)
+            .attr("x", cRadiusDefault*tXMultiplier)
+            .style("font", tFontDefault);
         d3.select(this).select("circle").transition()
-            .duration(750)/*
-            .style("fill", "#E34A33")*/
-            .attr("r", 16)
+            .duration(dTransitionOver)
+            .style("fill", cColorDefault)
+            .attr("r", cRadiusDefault);
+    }
+    
+    function click() {
     }
 
-    // action to take on mouse double click
     function dblclick() {
         d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", 6)/*
-            .style("fill", "#E34A33");*/
-        d3.select(this).select("text").transition()
-            .duration(750)
-            .attr("x", 12)/*
-            .style("stroke", "none")
-            .style("fill", "#E34A33")
-            .style("stroke", "none")
-            .style("opacity", 0.6)*/
-            .style("font", "7px serif");
+            .duration(dTransitionClicked)
     }
 </script>
  </body>
