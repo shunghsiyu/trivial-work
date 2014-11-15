@@ -22,32 +22,65 @@ pointer-events: none;
 <script src=http://d3js.org/d3.v3.min.js></script>
 
 <script>
-    var links = [
-            { "source" : "Chicago", "target" : "SF" },
-            { "source" : "Chicago", "target" : "Dallas" },
-            { "source" : "Chicago", "target" : "Miami" },
-            { "source" : "Chicago", "target" : "NY" },
-            { "source" : "SF", "target" : "Dallas" },
-            { "source" : "Dallas", "target" : "Miami" },
-            { "source" : "Miami", "target" : "NY" },
-            { "source" : "LA", "target" : "SF" },
-            { "source" : "LA", "target" : "Dallas" },
-            { "source" : "Houston", "target" : "Dallas" },
-            { "source" : "Houston", "target" : "Miami" },
-            { "source" : "Tampa", "target" : "Miami" },
-            { "source" : "Tampa", "target" : "NY" },
-            { "source" : "LA", "target" : "Houston" },
-            { "source" : "Houston", "target" : "Tampa" }
-    ]; 
-    
+    var links = [{
+        "source": "Chicago",
+        "target": "SF"
+    }, {
+        "source": "Chicago",
+        "target": "Dallas"
+    }, {
+        "source": "Chicago",
+        "target": "Miami"
+    }, {
+        "source": "Chicago",
+        "target": "NY"
+    }, {
+        "source": "SF",
+        "target": "Dallas"
+    }, {
+        "source": "Dallas",
+        "target": "Miami"
+    }, {
+        "source": "Miami",
+        "target": "NY"
+    }, {
+        "source": "LA",
+        "target": "SF"
+    }, {
+        "source": "LA",
+        "target": "Dallas"
+    }, {
+        "source": "Houston",
+        "target": "Dallas"
+    }, {
+        "source": "Houston",
+        "target": "Miami"
+    }, {
+        "source": "Tampa",
+        "target": "Miami"
+    }, {
+        "source": "Tampa",
+        "target": "NY"
+    }, {
+        "source": "LA",
+        "target": "Houston"
+    }, {
+        "source": "Houston",
+        "target": "Tampa"
+    }];
+
     var nodes = {}
 
     // Compute the distinct nodes from the links.
     links.forEach(function(link) {
         link.source = nodes[link.source] ||
-        (nodes[link.source] = {name: link.source});
+            (nodes[link.source] = {
+                name: link.source
+            });
         link.target = nodes[link.target] ||
-        (nodes[link.target] = {name: link.target});
+            (nodes[link.target] = {
+                name: link.target
+            });
         link.value = +link.value;
     });
 
@@ -62,6 +95,7 @@ pointer-events: none;
         .charge(-200)
         .on("tick", tick)
         .start();
+
     var svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -83,12 +117,14 @@ pointer-events: none;
 
     node.append("circle")
         .attr("r", 8)
-        .style("fill", "#3182bd");
+        .style("stroke", "black")
+        .style("fill", "seagreen")
+        .style("stroke-width", "2px");
 
     node.append("text")
         .attr("x", 12)
         .attr("dy", ".35em")
-        .style("fill", "#3182bd")
+        .style("fill", "black")
         .text(function(d) {
             return d.name;
         });
@@ -129,13 +165,13 @@ pointer-events: none;
         d3.select(this).select("text").transition()
             .duration(750)
             .attr("x", 22)
-            .style("stroke-width", ".5px")
+            /*.style("stroke-width", ".5px")
             .style("opacity", 1)
-            .style("fill", "#E34A33")
+            .style("fill", "#E34A33")*/
             .style("font", "17.5px serif");
         d3.select(this).select("circle").transition()
-            .duration(750)
-            .style("fill", "#E34A33")
+            .duration(750)/*
+            .style("fill", "#E34A33")*/
             .attr("r", 16)
     }
 
@@ -143,17 +179,16 @@ pointer-events: none;
     function dblclick() {
         d3.select(this).select("circle").transition()
             .duration(750)
-            .attr("r", 6)
-            .style("fill", "#E34A33");
+            .attr("r", 6)/*
+            .style("fill", "#E34A33");*/
         d3.select(this).select("text").transition()
             .duration(750)
-            .attr("x", 12)
+            .attr("x", 12)/*
             .style("stroke", "none")
             .style("fill", "#E34A33")
             .style("stroke", "none")
-            .style("opacity", 0.6)
+            .style("opacity", 0.6)*/
             .style("font", "7px serif");
     }
-
 </script>
  </body>
