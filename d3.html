@@ -10,9 +10,8 @@
         }
 
         .node circle {
-        stroke: #fff;
-        opacity: 0.6;
-        stroke-width: 1.5px;
+        opacity: 1.0;
+        stroke-width: 0px;
         }
 
         text {
@@ -55,6 +54,7 @@
 <script src=http://d3js.org/d3.v3.min.js></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
+    var nodesFixed = false;
     var dTransitionClicked = 750;
     var dTransitionOver = 200;
     var cRadiusDefault = 10;
@@ -133,11 +133,12 @@
     var nodeTip = d3.tip()
                 .attr("class", "d3-tip-node")
                 .offset([-10, 0])
+                .direction('n')
                 .html(function(d){return "Server load: 51%";});
 
     var linkTip = d3.tip()
                 .attr("class", "d3-tip-link")
-                .offset([0, 0])
+                .offset(function(d){return [d.x1, d.y1];})
                 .html(function(d){return "This is a link";});
 
     var force = d3.layout.force()
@@ -149,6 +150,26 @@
         .charge(-800)
         .on("tick", tick)
         .start();
+
+    force.alpha(0);
+    fixNodes();
+    nodes["NY"].px = 800;
+    nodes["NY"].py = 250;
+    nodes["SF"].px = 100;
+    nodes["SF"].py = 250;
+    nodes["Chicago"].px = 450;
+    nodes["Chicago"].py = 50;
+    nodes["Houston"].px = 450;
+    nodes["Houston"].py = 400;
+    nodes["LA"].px = 200;
+    nodes["LA"].py = 400;
+    nodes["Tampa"].px = 700;
+    nodes["Tampa"].py = 400;
+    nodes["Dallas"].px = 300;
+    nodes["Dallas"].py = 250;
+    nodes["Miami"].px = 600;
+    nodes["Miami"].py = 250;
+    force.start();
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -164,6 +185,7 @@
 
     link.append("line");
     link.append("line")
+        .attr("class", "linkbg")
         .style("opacity", "0")
         .style("stroke-width", cRadiusDefault*2+"px");
 
@@ -181,19 +203,49 @@
     node.append("circle")
         .attr("r", cRadiusDefault)
         .style("stroke", "black")
-        .style("fill", cColorDefault)
-        .style("stroke-width", "2px");
+        .style("fill", cColorDefault);
 
     node.append("text")
-        .attr("x", cRadiusDefault*tXMultiplier)
-        .attr("dy", ".35em")
+        .attr("x", cRadiusDefault*tXMultiplier+5)
+        .attr("y", "-5px")
         .style("font", tFontDefault)
         .style("fill", "black")
         .text(function(d) {
             return d.name;
         });
 
+    function unfixNodes() {
+        for (var key in nodes) {
+            if (nodes.hasOwnProperty(key)) {
+                nodes[key].fixed = false;
+            }
+        }
+        nodesFixed = false;
+    }
+
+    function fixNodes() {
+        for (var key in nodes) {
+            if (nodes.hasOwnProperty(key)) {
+                nodes[key].fixed = true;
+            }
+        }
+        nodesFixed = true;
+    }
+
     function tick() {
+        link.attr("x1", function(d) {
+                return d.source.x;
+            })
+            .attr("y1", function(d) {
+                return d.source.y;
+            })
+            .attr("x2", function(d) {
+                return d.target.x;
+            })
+            .attr("y2", function(d) {
+                return d.target.y;
+            });
+
         link.selectAll("line")
             .attr("x1", function(d) {
                 return d.source.x;
@@ -209,7 +261,7 @@
             });
 
         node.attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
+            return "translate(" + d.x + "," + d.y + ")"
         });
     }
 
@@ -241,6 +293,11 @@
 
     function nodeDbClick(d, i) {
         nodeTip.hide(d, i);
+        if(nodesFixed) {
+            unfixNodes();
+        } else {
+            fixNodes();
+        }
     }
 
     function linkOver(d, i) {
