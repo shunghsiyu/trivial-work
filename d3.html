@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    	<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+		<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	</head>
+	<body>
+	<style>
+		body {
+		  font: 10px sans-serif;
+		}
+
+		.d3-tip {
+		  line-height: 1;
+		  font-weight: bold;
+		  padding: 12px;
+		  background: rgba(0, 0, 0, 0.8);
+		  color: #fff;
+		  border-radius: 2px;
+		}
+
+		/* Creates a small triangle extender for the tooltip */
+		.d3-tip:after {
+		  box-sizing: border-box;
+		  display: inline;
+		  font-size: 10px;
+		  width: 100%;
+		  line-height: 1;
+		  color: rgba(0, 0, 0, 0.8);
+		  content: "\25BC";
+		  position: absolute;
+		  text-align: center;
+		}
+
+		/* Style northward tooltips differently */
+		.d3-tip.n:after {
+		  margin: -1px 0 0 0;
+		  top: 100%;
+		  left: 0;
+		}
+		</style>
+
+    	<div id="viz"></div>
+    	
+    	<script type="text/javascript">
+		var tip = d3.tip()
+					.attr("class", "d3-tip")
+					.offset([-10, 0])
+					.html(function(d){return d.name+"<br/><br/>"+"Load: "+d.load+"%";});
+
+		var multiplier = 2.5;
+		var base = 100;
+    	var names = ["NY", "Chicago", "LA", "Dallas", "Miami", "Tampa", "Houston", "SF"];
+    	var cx =    [315,  180,       90,   135,      225,     270,     180,       45];
+    	var cy =    [140,  80,        200,  140,      140,     200,     200,       140];
+    	var csize = [12,   12,        12,   12,       12,      12,      12,        12];
+    	var load =  [50,   50,        50,   50,       50,      50,      50,        50]
+    	var dataset = d3.range(names.length)
+    					.map(function(i) {
+    						return {name: names[i], x: base+cx[i]*multiplier, y: cy[i]*multiplier, r: csize[i], load: load[i]}
+    					});
+
+    	var sampleSVG = d3.select("#viz")
+    		.append("svg:svg")
+    		.attr("width", 1280)
+    		.attr("height", 720)
+    		.call(tip);
+
+    	sampleSVG.selectAll("circle")
+    		.data(dataset)
+    		.enter()
+    			.append("svg:circle")
+    			.style("stroke", "black")
+    			.style("fill", "seagreen")
+    			.style("stroke-width", "2px")
+    			.attr("r", function(d, i){return d.r;})
+    			.attr("cx", function(d, i){return d.x;})
+    			.attr("cy", function(d, i){return d.y;})
+    			.on("mouseover", cover)
+    			.on("mouseout", cout);
+
+    	function cover(d, i) {
+    		tip.show(d, i);
+    		d3.select(this)
+    			.transition()
+    				.delay(0)
+    				.duration(200)
+    				.style("fill", "lawngreen")
+    				.attr("r", function(d, i){return d.r*1.1;});
+    	};
+
+    	function cout(d, i) {
+    		tip.show(d, i);
+    		d3.select(this)
+    			.transition()
+    				.delay(0)
+    				.duration(200)
+	    			.style("fill", "seagreen")
+	    			.attr("r", function(d, i){return d.r;})
+    	}
+    	</script>
+	</body>
+</html>
