@@ -2,6 +2,9 @@
 <meta charset="utf-8">
 <body> 
 <style>
+        text {
+        font-family: sans-serif;
+        }
 
         .link line{
         stroke: #666;
@@ -15,7 +18,6 @@
         }
 
         .node text {
-        font-family: sans-serif;
         opacity: 0.6;
         pointer-events: none;
         }
@@ -45,6 +47,23 @@
 
         /* Style northward tooltips differently */
         .d3-tip-node.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+
+        .d3-tip-link {
+          line-height: 1;
+          font-weight: bold;
+          font: 30px sans-serif;
+          padding: 15px;
+          background: rgba(0, 0, 0, 0);
+          color: #555;
+          border-radius: 2px;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip-node.n:link {
           margin: -1px 0 0 0;
           top: 100%;
           left: 0;
@@ -138,7 +157,7 @@
 
     var linkTip = d3.tip()
                 .attr("class", "d3-tip-link")
-                .offset(function(d){return [d.x1, d.y1];})
+                .offset([0, 0])
                 .html(function(d){return "This is a link";});
 
     var force = d3.layout.force()
@@ -175,6 +194,17 @@
         .attr("width", width)
         .attr("height", height);
 
+    var legend = svg.append("rect")
+                    .style("opacity", "1")
+                    .style("fill", "#FFFFFF")
+                    .attr("width", 50)
+                    .attr("height", 25)
+                    .attr('width', 50)
+                    .attr('height', 25)
+                    .attr('x', 100)
+                    .attr('y', 100)
+                    .attr('class', 'legend')
+
     var link = svg.selectAll(".link")
         .data(force.links())
         .enter().append("g")
@@ -187,7 +217,7 @@
     link.append("line")
         .attr("class", "linkbg")
         .style("opacity", "0")
-        .style("stroke-width", cRadiusDefault*2+"px");
+        .style("stroke-width", cRadiusDefault*1.2+"px");
 
     var node = svg.selectAll(".node")
         .data(force.nodes())
@@ -265,7 +295,7 @@
         });
     }
 
-    function nodeOver(d, i) {
+    function nodeOver(d) {
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorOver)
@@ -274,9 +304,10 @@
             .duration(dTransitionOver)
             .attr("x", cRadiusOver*tXMultiplier)
             .style("font-size", tFontOver+"px");
+        nodeTip.show(d);
     }
 
-    function nodeOut(d, i) {
+    function nodeOut(d) {
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
@@ -285,14 +316,13 @@
             .duration(dTransitionOver)
             .style("fill", cColorDefault)
             .attr("r", cRadiusDefault);
+        nodeTip.hide(d);
     }
     
-    function nodeClick(d, i) {
-        nodeTip.show(d, i);
+    function nodeClick(d) {
     }
 
-    function nodeDbClick(d, i) {
-        nodeTip.hide(d, i);
+    function nodeDbClick(d) {
         if(nodesFixed) {
             unfixNodes();
         } else {
@@ -300,12 +330,12 @@
         }
     }
 
-    function linkOver(d, i) {
-        linkTip.show(d, i);
+    function linkOver(d) {
+        linkTip.show(d, legend.node());
     }
 
-    function linkOut(d, i) {
-        linkTip.hide(d, i);
+    function linkOut(d) {
+        linkTip.hide(d);
     }
 </script>
 </body>
