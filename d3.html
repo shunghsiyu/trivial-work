@@ -73,8 +73,8 @@
 <script src=http://d3js.org/d3.v3.min.js></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
-    var width = 1000;
-    var height = 600;
+    var width = 1200;
+    var height = 800;
     
     var nodesFixed = false;
     var dTransitionClicked = 750;
@@ -132,6 +132,24 @@
     }, {
         "source": "Houston",
         "target": "Tampa"
+    }, {
+        "source": "Server",
+        "target": "SF"
+    }, {
+        "source": "NY",
+        "target": "Client"
+    }, {
+        "source": "IXIA1",
+        "target": "Chicago"
+    }, {
+        "source": "LA",
+        "target": "IXIA2"
+    }, {
+        "source": "Houston",
+        "target": "IXIA2"
+    }, {
+        "source": "Tampa",
+        "target": "IXIA2"
     }];
 
     var nodes = {}
@@ -153,7 +171,7 @@
                 .attr("class", "d3-tip-node")
                 .offset([-10, 0])
                 .direction('n')
-                .html(function(d){return "Server load: 51%";});
+                .html(function(d){return "Server load: 51%<br/>"+d.x+", "+d.y;});
 
     var linkTip = d3.tip()
                 .attr("class", "d3-tip-link")
@@ -172,23 +190,36 @@
 
     force.alpha(0);
     fixNodes();
-    nodes["NY"].px = 800;
-    nodes["NY"].py = 250;
-    nodes["SF"].px = 100;
-    nodes["SF"].py = 250;
-    nodes["Chicago"].px = 450;
-    nodes["Chicago"].py = 50;
-    nodes["Houston"].px = 450;
-    nodes["Houston"].py = 400;
-    nodes["LA"].px = 200;
-    nodes["LA"].py = 400;
-    nodes["Tampa"].px = 700;
-    nodes["Tampa"].py = 400;
-    nodes["Dallas"].px = 300;
-    nodes["Dallas"].py = 250;
-    nodes["Miami"].px = 600;
-    nodes["Miami"].py = 250;
+    nodes["NY"].px = 810;
+    nodes["NY"].py = 310;
+    nodes["SF"].px = 280;
+    nodes["SF"].py = 310;
+    nodes["Chicago"].px = 530;
+    nodes["Chicago"].py = 190;
+    nodes["Houston"].px = 530;
+    nodes["Houston"].py = 460;
+    nodes["LA"].px = 360;
+    nodes["LA"].py = 460;
+    nodes["Tampa"].px = 730;
+    nodes["Tampa"].py = 460;
+    nodes["Dallas"].px = 450;
+    nodes["Dallas"].py = 310;
+    nodes["Miami"].px = 610;
+    nodes["Miami"].py = 310;
+    nodes["Server"].px = 120;
+    nodes["Server"].py = 310;
+    nodes["Client"].px = 970;
+    nodes["Client"].py = 310;
+    nodes["IXIA1"].px = 520;
+    nodes["IXIA1"].py = 70;
+    nodes["IXIA2"].px = 520;
+    nodes["IXIA2"].py = 610;
     force.start();
+
+    nodes["Server"].px = 120;
+    nodes["Client"].px = 970;
+    nodes["IXIA1"].px = 520;
+    nodes["IXIA2"].px = 520;
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -286,10 +317,10 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            .interrupt()
+            /*.interrupt()
             .transition()
                 .duration(tchange)
-                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()});
+                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()})*/;
 
         offset = offset*-1;
         link.selectAll("line.link1")
@@ -305,10 +336,10 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            .interrupt()
+            /*.interrupt()
             .transition()
                 .duration(tchange)
-                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()});
+                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()})*/;
 
         node.attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")"
