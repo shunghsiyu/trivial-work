@@ -245,10 +245,10 @@
         .call(linkTip);
 
     link.append("line")
-        .style("stroke", "#333399")
+        .style("stroke", "#2222CC")
         .attr("class", "link1");
     link.append("line")
-        .style("stroke", "#993333")
+        .style("stroke", "#CC2222")
         .attr("class", "link2");
 
     link.append("line")
@@ -306,7 +306,7 @@
 
     function forceTick() {
         var tchange = 200;
-        var offset = 5;
+        var offset = 2.5;
         link.selectAll("line.link2")
             .attr("x1", function(d) {
                 return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
