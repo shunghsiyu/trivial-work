@@ -6,7 +6,7 @@
         .link line{
         stroke: #666;
         opacity: 0.6;
-        stroke-width: 1.5px;
+        stroke-width: 5px;
         }
 
         .node circle {
@@ -14,8 +14,8 @@
         stroke-width: 0px;
         }
 
-        text {
-        font: 12px sans-serif;
+        .node text {
+        font-family: sans-serif;
         opacity: 0.6;
         pointer-events: none;
         }
@@ -54,16 +54,19 @@
 <script src=http://d3js.org/d3.v3.min.js></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
+    var width = 1000;
+    var height = 600;
+    
     var nodesFixed = false;
     var dTransitionClicked = 750;
     var dTransitionOver = 200;
-    var cRadiusDefault = 10;
-    var cRadiusOver = 16;
+    var cRadiusDefault = 30;
+    var cRadiusOver = cRadiusDefault*1.1;
     var cColorDefault = "seagreen";
     var cColorOver = "lawngreen";
     var tXMultiplier = 1.5;
-    var tFontDefault = "12px sans-serif";
-    var tFontOver =  "20px sans-serif";
+    var tFontDefault = 30
+    var tFontOver =  40;
 
     var links = [{
         "source": "Chicago",
@@ -126,9 +129,6 @@
             });
         link.value = +link.value;
     });
-
-    var width = 900
-    var height = 600;
 
     var nodeTip = d3.tip()
                 .attr("class", "d3-tip-node")
@@ -208,7 +208,7 @@
     node.append("text")
         .attr("x", cRadiusDefault*tXMultiplier+5)
         .attr("y", "-5px")
-        .style("font", tFontDefault)
+        .style("font-size", tFontDefault+"px")
         .style("fill", "black")
         .text(function(d) {
             return d.name;
@@ -273,14 +273,14 @@
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusOver*tXMultiplier)
-            .style("font", tFontOver);
+            .style("font-size", tFontOver+"px");
     }
 
     function nodeOut(d, i) {
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
-            .style("font", tFontDefault);
+            .style("font-size", tFontDefault+"px");
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorDefault)
