@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body> 
+<style>
+</style>
+<script src=http://d3js.org/d3.v3.min.js></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+	var width = 1200;
+	var height = 800;
+
+	var dataset;
+	getJson();
+
+	var svg = d3.select("body").append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+
+	setInterval(getJson, 500);
+	setInterval(tick, 1000);
+
+	function getJson() {
+		d3.json("mydata.json", function(error, json){
+			if(error) return console.warn(error);
+			console.log(json["linkMetrics"][0]);
+			dataset = json;
+		});
+	}
+
+	function tick() {
+		if(!dataset) return;
+
+		var circle = svg.selectAll("circle")
+			.data(dataset["linkMetrics"]);
+			
+		circle.enter()
+			.append("circle")
+			.style("fill", "black")
+			.attr("r", function(d,i){return d})
+			.attr("cx", function(d,i){return (i+1)*50})
+			.attr("cy", 50);
+
+		circle.attr("r", function(d,i){return d});
+	}
+</script>
+</body>
