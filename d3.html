@@ -109,23 +109,23 @@
         "source": "Miami",
         "target": "NY"
     }, {
-        "source": "LA",
-        "target": "SF"
+        "source": "SF",
+        "target": "LA"
     }, {
-        "source": "LA",
-        "target": "Dallas"
+        "source": "Dallas",
+        "target": "LA"
     }, {
-        "source": "Houston",
-        "target": "Dallas"
+        "source": "Dallas",
+        "target": "Houston"
     }, {
-        "source": "Houston",
-        "target": "Miami"
+        "source": "Miami",
+        "target": "Houston"
     }, {
-        "source": "Tampa",
-        "target": "Miami"
+        "source": "Miami",
+        "target": "Tampa"
     }, {
-        "source": "Tampa",
-        "target": "NY"
+        "source": "NY",
+        "target": "Tampa"
     }, {
         "source": "LA",
         "target": "Houston"
@@ -138,6 +138,12 @@
     }, {
         "source": "NY",
         "target": "Client"
+    }, {
+        "source": "IXIA1",
+        "target": "Chicago"
+    }, {
+        "source": "IXIA1",
+        "target": "Chicago"
     }, {
         "source": "IXIA1",
         "target": "Chicago"
@@ -402,7 +408,11 @@
         var dx = (nx2 - nx1);
         var dy = (ny2 - ny1);
         var normal = Math.sqrt((dx * dx) + (dy * dy));
-        if(dx >= 0) {
+        
+        if(dx == 0 && dy < 0) {
+        // Do nothing, prevents crossing problem
+        }
+        else if(dx >= 0) {
             dx = dx*-1;
             dy = dy*-1;
         }
