@@ -36,9 +36,9 @@
       dataset.shift();
       circle
         .data(dataset)
-        .style("fill", function(d){return d3.hsl(d, 1, 0.5).toString()})
         .transition()
-          .duration(500)
+          .duration(2000)
+          .style("fill", function(d){return d3.hsl(d, 1, 0.5).toString()})
           .each("end", mytick);
     }
 </script>
