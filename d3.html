@@ -87,6 +87,8 @@
     var tFontDefault = 30
     var tFontOver =  40;
 
+    var dataset;
+
     var links = [{
         "source": "Chicago",
         "target": "SF"
@@ -171,7 +173,11 @@
                 name: link.target
             });
         link.value = +link.value;
+        link.inbps = 0;
+        link.outbps = 0;
     });
+
+    updateDataset();
 
     var nodeTip = d3.tip()
                 .attr("class", "d3-tip-node")
@@ -250,11 +256,13 @@
         .on("mouseout", linkOut)
         .call(linkTip);
 
+    var link1Color = "#2222CC";
     link.append("line")
-        .style("stroke", "#2222CC")
+        .style("stroke", "grey")
         .attr("class", "link1");
+    var link2Color = "#CC2222";
     link.append("line")
-        .style("stroke", "#CC2222")
+        .style("stroke", "grey")
         .attr("class", "link2");
 
     link.append("line")
@@ -292,6 +300,28 @@
 
     console.log(getNormal(398, 20, 110, -20, 1)[0], getNormal(398, 20, 110, -20, 1)[1]);
 
+    setInterval(updateDataset, 5000);
+
+    function updateDataset() {
+        d3.json("network.json", function(error, json){
+            /*if(error) return console.warn(error);*/
+            console.log(json["linkMetrics"].length);
+            dataset = json;
+        });
+
+        if(!dataset) return;
+
+        var link1Data = dataset["linkMetrics"].slice(0,23);
+        links.forEach(function(link, i) {
+            link.inbps = link1Data[i];
+        });
+
+        var link2Data = dataset["linkMetrics"].slice(23,46);
+        links.forEach(function(link, i) {
+            link.outbps = link2Data[i];
+        });
+    }
+
     function unfixNodes() {
         for (var key in nodes) {
             if (nodes.hasOwnProperty(key)) {
@@ -326,10 +356,9 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            /*.interrupt()
             .transition()
                 .duration(tchange)
-                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()})*/;
+                .style("stroke", function(d){return getNewColor(d.inbps, link2Color)});
 
         offset = offset*-1;
         link.selectAll("line.link1")
@@ -345,14 +374,21 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            /*.interrupt()
             .transition()
                 .duration(tchange)
-                .style("stroke", function(d){return d3.hsl(Math.random()*360, 1, 0.5).toString()})*/;
+                .style("stroke", function(d){return getNewColor(d.outbps, link1Color)});
 
         node.attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")"
         });
+
+        function getNewColor(bps, linkColor) {
+            var maxbps = 100;
+            var svalue = (bps < maxbps) ? bps/maxbps : 1;
+            var oldColor = d3.hsl(linkColor);
+            var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
+            return newColor.toString();
+        }
     }
 
     function nodeOver(d) {
