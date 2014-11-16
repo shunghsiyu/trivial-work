@@ -2,35 +2,90 @@
 <meta charset="utf-8">
 <body> 
 <style>
-.link {
-stroke: #666;
-opacity: 0.6;
-stroke-width: 1.5px;
-}
-.node circle {
-stroke: #fff;
-opacity: 0.6;
-stroke-width: 1.5px;
-}
-text {
-font: 7px serif;
-opacity: 0.6;
-pointer-events: none;
-}
+        text {
+        font-family: sans-serif;
+        }
+
+        .link line{
+        stroke: #666;
+        opacity: 0.6;
+        stroke-width: 5px;
+        }
+
+        .node circle {
+        opacity: 1.0;
+        stroke-width: 0px;
+        }
+
+        .node text {
+        opacity: 0.6;
+        pointer-events: none;
+        }
+
+        .d3-tip-node {
+          line-height: 1;
+          font-weight: bold;
+          font: 12px sans-serif;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip-node:after {
+          box-sizing: border-box;
+          display: inline;
+          font-size: 10px;
+          width: 100%;
+          line-height: 1;
+          color: rgba(0, 0, 0, 0.8);
+          content: "\25BC";
+          position: absolute;
+          text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip-node.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+
+        .d3-tip-link {
+          line-height: 1;
+          font-weight: bold;
+          font: 30px sans-serif;
+          padding: 15px;
+          background: rgba(0, 0, 0, 0);
+          color: #555;
+          border-radius: 2px;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip-node.n:link {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
 </style>
 
 <script src=http://d3js.org/d3.v3.min.js></script>
-
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
+    var width = 1000;
+    var height = 600;
+    
+    var nodesFixed = false;
     var dTransitionClicked = 750;
     var dTransitionOver = 200;
-    var cRadiusDefault = 10;
-    var cRadiusOver = 16;
+    var cRadiusDefault = 30;
+    var cRadiusOver = cRadiusDefault*1.1;
     var cColorDefault = "seagreen";
     var cColorOver = "lawngreen";
     var tXMultiplier = 1.5;
-    var tFontDefault = "12px serif";
-    var tFontOver =  "20px serif";
+    var tFontDefault = 30
+    var tFontOver =  40;
 
     var links = [{
         "source": "Chicago",
@@ -94,54 +149,134 @@ pointer-events: none;
         link.value = +link.value;
     });
 
-    var width = 900
-    var height = 600;
+    var nodeTip = d3.tip()
+                .attr("class", "d3-tip-node")
+                .offset([-10, 0])
+                .direction('n')
+                .html(function(d){return "Server load: 51%";});
+
+    var linkTip = d3.tip()
+                .attr("class", "d3-tip-link")
+                .offset([0, 0])
+                .html(function(d){return "This is a link";});
 
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(100)
-        .charge(-200)
+        .linkDistance(200)
+        .friction(0.9)
+        .charge(-800)
         .on("tick", tick)
         .start();
+
+    force.alpha(0);
+    fixNodes();
+    nodes["NY"].px = 800;
+    nodes["NY"].py = 250;
+    nodes["SF"].px = 100;
+    nodes["SF"].py = 250;
+    nodes["Chicago"].px = 450;
+    nodes["Chicago"].py = 50;
+    nodes["Houston"].px = 450;
+    nodes["Houston"].py = 400;
+    nodes["LA"].px = 200;
+    nodes["LA"].py = 400;
+    nodes["Tampa"].px = 700;
+    nodes["Tampa"].py = 400;
+    nodes["Dallas"].px = 300;
+    nodes["Dallas"].py = 250;
+    nodes["Miami"].px = 600;
+    nodes["Miami"].py = 250;
+    force.start();
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height);
 
+    var legend = svg.append("rect")
+                    .style("opacity", "1")
+                    .style("fill", "#FFFFFF")
+                    .attr("width", 50)
+                    .attr("height", 25)
+                    .attr('width', 50)
+                    .attr('height', 25)
+                    .attr('x', 100)
+                    .attr('y', 100)
+                    .attr('class', 'legend')
+
     var link = svg.selectAll(".link")
         .data(force.links())
-        .enter().append("line")
-        .attr("class", "link");
+        .enter().append("g")
+        .attr("class", "link")
+        .on("mouseover", linkOver)
+        .on("mouseout", linkOut)
+        .call(linkTip);
+
+    link.append("line");
+    link.append("line")
+        .attr("class", "linkbg")
+        .style("opacity", "0")
+        .style("stroke-width", cRadiusDefault*1.2+"px");
 
     var node = svg.selectAll(".node")
         .data(force.nodes())
         .enter().append("g")
         .attr("class", "node")
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("click", click)
-        .on("dblclick", dblclick)
-        .call(force.drag);
+        .on("mouseover", nodeOver)
+        .on("mouseout", nodeOut)
+        .on("click", nodeClick)
+        .on("dblclick", nodeDbClick)
+        .call(force.drag)
+        .call(nodeTip);
 
     node.append("circle")
         .attr("r", cRadiusDefault)
         .style("stroke", "black")
-        .style("fill", cColorDefault)
-        .style("stroke-width", "2px");
+        .style("fill", cColorDefault);
 
     node.append("text")
-        .attr("x", cRadiusDefault*tXMultiplier)
-        .attr("dy", ".35em")
-        .style("font", tFontDefault)
+        .attr("x", cRadiusDefault*tXMultiplier+5)
+        .attr("y", "-5px")
+        .style("font-size", tFontDefault+"px")
         .style("fill", "black")
         .text(function(d) {
             return d.name;
         });
 
+    function unfixNodes() {
+        for (var key in nodes) {
+            if (nodes.hasOwnProperty(key)) {
+                nodes[key].fixed = false;
+            }
+        }
+        nodesFixed = false;
+    }
+
+    function fixNodes() {
+        for (var key in nodes) {
+            if (nodes.hasOwnProperty(key)) {
+                nodes[key].fixed = true;
+            }
+        }
+        nodesFixed = true;
+    }
+
     function tick() {
-        link
+        link.attr("x1", function(d) {
+                return d.source.x;
+            })
+            .attr("y1", function(d) {
+                return d.source.y;
+            })
+            .attr("x2", function(d) {
+                return d.target.x;
+            })
+            .attr("y2", function(d) {
+                return d.target.y;
+            });
+
+        link.selectAll("line")
             .attr("x1", function(d) {
                 return d.source.x;
             })
@@ -156,11 +291,11 @@ pointer-events: none;
             });
 
         node.attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
+            return "translate(" + d.x + "," + d.y + ")"
         });
     }
 
-    function mouseover() {
+    function nodeOver(d) {
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorOver)
@@ -168,24 +303,39 @@ pointer-events: none;
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusOver*tXMultiplier)
-            .style("font", tFontOver);
+            .style("font-size", tFontOver+"px");
+        nodeTip.show(d);
     }
 
-    function mouseout() {
+    function nodeOut(d) {
         d3.select(this).select("text").transition()
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
-            .style("font", tFontDefault);
+            .style("font-size", tFontDefault+"px");
         d3.select(this).select("circle").transition()
             .duration(dTransitionOver)
             .style("fill", cColorDefault)
             .attr("r", cRadiusDefault);
+        nodeTip.hide(d);
     }
     
-    function click() {
+    function nodeClick(d) {
     }
 
-    function dblclick() {
+    function nodeDbClick(d) {
+        if(nodesFixed) {
+            unfixNodes();
+        } else {
+            fixNodes();
+        }
+    }
+
+    function linkOver(d) {
+        linkTip.show(d, legend.node());
+    }
+
+    function linkOut(d) {
+        linkTip.hide(d);
     }
 </script>
- </body>
+</body>
