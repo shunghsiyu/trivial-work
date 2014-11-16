@@ -167,7 +167,7 @@
         .linkDistance(200)
         .friction(0.9)
         .charge(-800)
-        .on("tick", tick)
+        .on("tick", forceTick)
         .start();
 
     force.alpha(0);
@@ -213,7 +213,13 @@
         .on("mouseout", linkOut)
         .call(linkTip);
 
-    link.append("line");
+    link.append("line")
+        .style("stroke", "#333399")
+        .attr("class", "link1");
+    link.append("line")
+        .style("stroke", "#993333")
+        .attr("class", "link2");
+
     link.append("line")
         .attr("class", "linkbg")
         .style("opacity", "0")
@@ -236,13 +242,15 @@
         .style("fill", cColorDefault);
 
     node.append("text")
-        .attr("x", cRadiusDefault*tXMultiplier+5)
-        .attr("y", "-5px")
+        .attr("x", cRadiusDefault*tXMultiplier)
+        .attr("y", "-15px")
         .style("font-size", tFontDefault+"px")
         .style("fill", "black")
         .text(function(d) {
             return d.name;
         });
+
+    console.log(getNormal(398, 20, 110, -20, 1)[0], getNormal(398, 20, 110, -20, 1)[1]);
 
     function unfixNodes() {
         for (var key in nodes) {
@@ -262,32 +270,35 @@
         nodesFixed = true;
     }
 
-    function tick() {
-        link.attr("x1", function(d) {
-                return d.source.x;
+    function forceTick() {
+        var offset = 5;
+        link.selectAll("line.link2")
+            .attr("x1", function(d) {
+                return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
             })
             .attr("y1", function(d) {
-                return d.source.y;
+                return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[1];
             })
             .attr("x2", function(d) {
-                return d.target.x;
+                return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[0];
             })
             .attr("y2", function(d) {
-                return d.target.y;
+                return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             });
 
-        link.selectAll("line")
+        offset = offset*-1;
+        link.selectAll("line.link1")
             .attr("x1", function(d) {
-                return d.source.x;
+                return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
             })
             .attr("y1", function(d) {
-                return d.source.y;
+                return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[1];
             })
             .attr("x2", function(d) {
-                return d.target.x;
+                return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[0];
             })
             .attr("y2", function(d) {
-                return d.target.y;
+                return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             });
 
         node.attr("transform", function(d) {
@@ -328,6 +339,8 @@
         } else {
             fixNodes();
         }
+        force.on("tick", null);
+        force.alpha(0);
     }
 
     function linkOver(d) {
@@ -336,6 +349,24 @@
 
     function linkOut(d) {
         linkTip.hide(d);
+    }
+
+    function getNormal(x1, y1, x2, y2, offset) {
+        var nx1 = parseFloat(x1);
+        var ny1 = parseFloat(y1);
+        var nx2 = parseFloat(x2);
+        var ny2 = parseFloat(y2);
+        var dx = (nx2 - nx1);
+        var dy = (ny2 - ny1);
+        var normal = Math.sqrt((dx * dx) + (dy * dy));
+        if(dx >= 0) {
+            dx = dx*-1;
+            dy = dy*-1;
+        }
+
+        var newX = nx1 + offset*(dy/normal);
+        var newY = ny1 - offset*(dx/normal);
+        return [newX, newY];
     }
 </script>
 </body>
