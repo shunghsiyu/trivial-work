@@ -216,10 +216,10 @@
     nodes["IXIA2"].py = 610;
     force.start();
 
-    nodes["Server"].px = 120;
-    nodes["Client"].px = 970;
-    nodes["IXIA1"].px = 520;
-    nodes["IXIA2"].px = 520;
+    nodes["Server"].mys = "square";
+    nodes["Client"].mys = "square";
+    nodes["IXIA1"].mys = "square";
+    nodes["IXIA2"].mys = "square";
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -267,10 +267,13 @@
         .call(force.drag)
         .call(nodeTip);
 
-    node.append("circle")
-        .attr("r", cRadiusDefault)
-        .style("stroke", "black")
-        .style("fill", cColorDefault);
+    node.append("path")
+        .attr("class", "path")
+        .attr("d", d3.svg.symbol().type(function(d){ return (d.mys) ? d.mys : "circle";}))
+        .attr("transform", "scale(7)");
+
+    node.selectAll('.path')
+        .style("fill", function(d){return (d.mys)?"grey":cColorDefault});
 
     node.append("text")
         .attr("x", cRadiusDefault*tXMultiplier)
