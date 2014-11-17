@@ -71,8 +71,8 @@
         }
 </style>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="js/d3.min.js"></script>
+<script src="js/d3.tip.v0.6.3.js"></script>
 <script>
     var width = 1200;
     var height = 800;
@@ -311,7 +311,7 @@
 
     function updateDataset() {
         /* https://172.16.0.152:443 /api/jssdk/my-app-test/datas*/
-        d3.json("network.json").header("Accept", "application/vnd.jssdk.my-app-test.datas+json;version=1").get(function(error, json){
+        d3.json("/api/jssdk/my-app-test/datas").header("Accept", "application/vnd.jssdk.my-app-test.datas+json;version=1").get(function(error, json){
             if(error) return console.warn(error);
             console.log(json.datas.data.length);
             dataset = json;
