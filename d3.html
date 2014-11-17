@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<body> 
+<body>
+<div id="topology">
 <style>
         text {
         font-family: sans-serif;
@@ -70,7 +71,7 @@
         }
 </style>
 
-<script src=http://d3js.org/d3.v3.min.js></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
     var width = 1200;
@@ -78,7 +79,7 @@
     
     var nodesFixed = false;
     var dTransitionClicked = 750;
-    var dTransitionOver = 200;
+    var dTransitionOver = 300;
     var cRadiusDefault = 30;
     var cRadiusOver = cRadiusDefault*1.1;
     var cColorDefault = "seagreen";
@@ -86,11 +87,17 @@
     var tXMultiplier = 1.5;
     var tFontDefault = 30
     var tFontOver =  40;
+    var tColor = "black";
+    var pathScale = 7;
+    var baseColor = "grey"
 
     var dataset;
     var link1Data;
     var link2Data;
-    
+    var link1Color = "#2222CC";
+    var link2Color = "#CC2222";
+
+
     var links = [{
         "source": "Chicago",
         "target": "SF"
@@ -235,7 +242,7 @@
     nodes["IXIA1"].mys = "square";
     nodes["IXIA2"].mys = "square";
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#topology").append("svg")
         .attr("width", width)
         .attr("height", height);
 
@@ -258,13 +265,11 @@
         .on("mouseout", linkOut)
         .call(linkTip);
 
-    var link1Color = "#2222CC";
     link.append("line")
-        .style("stroke", "grey")
+        .style("stroke", baseColor)
         .attr("class", "link1");
-    var link2Color = "#CC2222";
     link.append("line")
-        .style("stroke", "grey")
+        .style("stroke", baseColor)
         .attr("class", "link2");
 
     link.append("line")
@@ -286,50 +291,50 @@
     node.append("path")
         .attr("class", "path")
         .attr("d", d3.svg.symbol().type(function(d){ return (d.mys) ? d.mys : "circle";}))
-        .attr("transform", "scale(7)");
+        .attr("transform", "scale("+pathScale+")");
 
     node.selectAll('.path')
-        .style("fill", function(d){return (d.mys)?"grey":cColorDefault});
+        .style("fill", function(d){return (d.mys)?baseColor:cColorDefault})
+        .attr("data-defaultC", function(d){return (d.mys)?baseColor:cColorDefault});;
 
     node.append("text")
         .attr("x", cRadiusDefault*tXMultiplier)
-        .attr("y", "-15px")
+        .attr("y", "-"+cRadiusDefault/2+"px")
         .style("font-size", tFontDefault+"px")
-        .style("fill", "black")
+        .style("fill", tColor)
         .text(function(d) {
             return d.name;
         });
 
-    console.log(getNormal(398, 20, 110, -20, 1)[0], getNormal(398, 20, 110, -20, 1)[1]);
-
-    var dataUpdateTime = 2500;
+    var dataUpdateTime = 10000;
     setInterval(updateDataset, dataUpdateTime);
 
     function updateDataset() {
-        d3.json("network.json", function(error, json){
-            /*if(error) return console.warn(error);*/
-            console.log(json["linkMetrics"].length);
+        /* https://172.16.0.152:443 /api/jssdk/my-app-test/datas*/
+        d3.json("network.json").header("Accept", "application/vnd.jssdk.my-app-test.datas+json;version=1").get(function(error, json){
+            if(error) return console.warn(error);
+            console.log(json.datas.data.length);
             dataset = json;
         });
 
         if(!dataset) return;
 
-        link1Data = dataset["linkMetrics"].slice(0,23);
+        link1Data = dataset.datas.data.slice(0,23);
         links.forEach(function(link, i) {
             link.inbps = link1Data[i];
         });
         link.selectAll("line.link1")
             .transition()
-            .duration(300)
+            .duration(dTransitionOver)
                 .style("stroke", function(d){return getNewColor(d.inbps, link1Color)});
 
-        link2Data = dataset["linkMetrics"].slice(23,46);
+        link2Data = dataset.datas.data.slice(23,46);
         links.forEach(function(link, i) {
             link.outbps = link2Data[i];
         });
         link.selectAll("line.link2")
             .transition()
-            .duration(300)
+            .duration(dTransitionOver)
                 .style("stroke", function(d){return getNewColor(d.outbps, link2Color)});
     }
 
@@ -390,16 +395,16 @@
     }
 
     function getNewColor(bps, linkColor) {
-        var maxbps = 10;
-        var logvalue = Math.log(bps);
-        var svalue = (logvalue < maxbps) ? logvalue / maxbps : 1;
+        var maxbps = 8000000000*0.8;
+        var logMaxbps = Math.log(maxbps)
+        var svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
         var oldColor = d3.hsl(linkColor);
         var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
         return newColor.toString();
     }
 
     function nodeOver(d) {
-        d3.select(this).select("circle").transition()
+        d3.select(this).select("path").transition()
             .duration(dTransitionOver)
             .style("fill", cColorOver)
             .attr("r", cRadiusOver);
@@ -415,9 +420,9 @@
             .duration(dTransitionOver)
             .attr("x", cRadiusDefault*tXMultiplier)
             .style("font-size", tFontDefault+"px");
-        d3.select(this).select("circle").transition()
+        d3.select(this).select("path").transition()
             .duration(dTransitionOver)
-            .style("fill", cColorDefault)
+            .style("fill", function(d){return (d.mys) ? baseColor : cColorDefault;})
             .attr("r", cRadiusDefault);
         nodeTip.hide(d);
     }
@@ -431,6 +436,7 @@
         } else {
             fixNodes();
         }
+        // freeze
         /*force.on("tick", null);
         force.alpha(0);*/
     }
