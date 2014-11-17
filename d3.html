@@ -9,7 +9,7 @@
         .link line{
         stroke: #666;
         opacity: 0.6;
-        stroke-width: 5px;
+        stroke-width: 10px;
         }
 
         .node circle {
@@ -330,7 +330,7 @@
         link.selectAll("line.link2")
             .transition()
             .duration(300)
-                .style("stroke", function(d){return getNewColor(d.inbps, link2Color)});
+                .style("stroke", function(d){return getNewColor(d.outbps, link2Color)});
     }
 
     function unfixNodes() {
@@ -353,7 +353,7 @@
 
     function forceTick() {
         var tchange = 200;
-        var offset = 2.5;
+        var offset = 5;
         link.selectAll("line.link2")
             .attr("x1", function(d) {
                 return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
@@ -390,8 +390,9 @@
     }
 
     function getNewColor(bps, linkColor) {
-        var maxbps = 100;
-        var svalue = (bps < maxbps) ? bps / maxbps : 1;
+        var maxbps = 10;
+        var logvalue = Math.log(bps);
+        var svalue = (logvalue < maxbps) ? logvalue / maxbps : 1;
         var oldColor = d3.hsl(linkColor);
         var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
         return newColor.toString();
