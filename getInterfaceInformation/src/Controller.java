@@ -1,9 +1,9 @@
-
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
 import java.util.ArrayList;
-//import getInterfaceInformation;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jsoup.Jsoup;
@@ -54,7 +54,7 @@ class ParserUtils {
     private static final String USER = "super";
     private static final String PASSWORD = "juniper123";
     private static final String PROTOCOL = "https";
-    private static final String HOST = "172.16.0.152";
+    private static final String HOST = "127.0.0.1";
     private static final String PORT = "443";
 
     @SuppressWarnings("deprecation")
@@ -253,15 +253,15 @@ class TOPOLOGY {
             LINKS[i] = new Link(i, 1024);
         }
 
-        ROUTERS = new HashMap<>(ROUTERNUMBER);
+        ROUTERS = new HashMap<String, HashMap<String, pair>>(ROUTERNUMBER);
 
-        HashMap<String, pair> interfacesChicago = new HashMap<>();
-        HashMap<String, pair> interfacesDallas = new HashMap<>();
-        HashMap<String, pair> interfacesSF = new HashMap<>();
-        HashMap<String, pair> interfacesHouston = new HashMap<>();
-        HashMap<String, pair> interfacesTempa = new HashMap<>();
-        HashMap<String, pair> interfacesNY = new HashMap<>();
-        HashMap<String, pair> interfacesMiami = new HashMap<>();
+        HashMap<String, pair> interfacesChicago = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesDallas = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesSF = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesHouston = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesTempa = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesNY = new HashMap<String, pair>();
+        HashMap<String, pair> interfacesMiami = new HashMap<String, pair>();
         HashMap<String, pair> interfacesLA = new HashMap<String, pair>();
 
         interfacesChicago.put("ge-1/0/1", new pair(23, 0));
@@ -295,8 +295,7 @@ class TOPOLOGY {
         interfacesNY.put("ge-1/0/3", new pair(6, 29));
         interfacesNY.put("ge-1/0/5", new pair(3, 26));
         interfacesNY.put("ge-1/0/7", new pair(35, 12));
-        interfacesNY.put("ge-1/0/8", new pair(39, 16));
-        interfacesNY.put("xe-0/0/0", new pair(43, 20));
+        interfacesNY.put("xe-0/0/0", new pair(39, 16));
         
         
         interfacesMiami.put("ge-0/1/0", new pair(33, 10));
@@ -412,16 +411,17 @@ class Monitor implements Runnable {
             this.id = id;
         }
 
-        public void parseAndPrint() throws KeyManagementException, NoSuchAlgorithmException, IOException {
-
-            Document reply = Jsoup.parse(ParserUtils.getReplyFrom(id), "", Parser.xmlParser());
+        public void parseAndPrint() throws IOException {
+        	XMLGetter xmlGetter = new XMLGetter();
+            Document reply = Jsoup.parse(xmlGetter.getReplyFrom(id), "", Parser.xmlParser());
 
             Element replyMsgData = reply.select("replyMsgData").first();
             if (replyMsgData == null) {
                 throw new IOException("Cann't retrieve configuration information from " + id);
             }
 
-            Document information = Jsoup.parse(replyMsgData.text(), "", Parser.xmlParser());
+            
+            Document information = Jsoup.parse(StringEscapeUtils.unescapeXml(replyMsgData.text()), "", Parser.xmlParser());
             Elements pifs = information.select("physical-interface");
             Element[] pifsArray = new Element[pifs.size()];
 
@@ -481,12 +481,6 @@ class Monitor implements Runnable {
 
         try {
             IParser.parseAndPrint();
-        } catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -506,16 +500,7 @@ class Monitor implements Runnable {
     ;
 	@Override
     public void run() {
-        while (true) {
             getLinkStat();
-            Thread.yield();
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
 
     }
 }
@@ -524,18 +509,25 @@ class Engine implements Runnable {
     //private static final int L = 4;
 
     LinkMetrics lm;
+    int best;
 
     Engine(LinkMetrics lm) {
-
+    	this.best = -1;
         this.lm = lm;
         //System.out.println(lsps);
         //System.out.println("Engine's on.");
     }
 
-    @Override
-    public void run() {
+    public LinkMetrics getLm() {
+		return lm;
+	}
 
-        while (true) {
+	public int getBest() {
+		return best;
+	}
+
+	@Override
+    public void run() {
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
@@ -555,22 +547,19 @@ class Engine implements Runnable {
             long l = Math.max(Math.max(TOPOLOGY.BANDWIDTH - l1, TOPOLOGY.BANDWIDTH - l2), Math.max(TOPOLOGY.BANDWIDTH - l3, TOPOLOGY.BANDWIDTH - l4));
             l = TOPOLOGY.BANDWIDTH - l;
             if (l == l2) {
-                System.out.println("choose LSP 2");
+                best = 2;
 
             } else if (l == l1) {
-                System.out.println("choose LSP 1");
+                best = 1;
 
             } else if (l == l3) {
-                System.out.println("choose LSP 3");
+                best = 3;
 
             } else if (l == l4) {
-                System.out.println("choose LSP 4");
-
+                best = 4;
             } else {
-                System.out.println("opps");
+                best = -1;
             }
-            Thread.yield();
-        }
 
         //
         //
@@ -633,7 +622,7 @@ class WriteList implements Runnable {
 		sb.append(end);
 		
 		try {
-			FileWriter fw = new FileWriter("/Users/shunghsiyu/git/jsdkhackathon/network.json");
+			FileWriter fw = new FileWriter("network.json");
 			fw.write(sb.toString());
 			fw.close();
 			System.out.println("JSON Written!");
@@ -655,7 +644,7 @@ public class Controller {
     //ArrayList<Integer> m1 = new ArrayList<Integer>(15);
     //ArrayList<Integer> m2 = new ArrayList<Integer>(15);
 
-    public static void main(String[] args) {
+    public static List<Long> getEngine() {
         LinkMetrics matrix = new LinkMetrics(46);
 
         ArrayList<Monitor> monitors = new ArrayList<Monitor>(TOPOLOGY.ROUTERNUMBER);
@@ -669,11 +658,24 @@ public class Controller {
         for (int i = 0; i < TOPOLOGY.ROUTERNUMBER; i++) {
             threads.get(i).start();
         }
-        Thread mainThread = new Thread(new Engine(matrix));
-        mainThread.start();
-        new Thread(new WriteList(matrix)).start();
-		//Montors m1 = new Monitors()
+        for (int i = 0; i < TOPOLOGY.ROUTERNUMBER; i++) {
+            try {
+				threads.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+        
+        Engine engine = new Engine(matrix);
+        engine.run();
+        
+        // Write the matrix to a JSON
+        //new Thread(new WriteList(matrix)).start();
+		
+        //Montors m1 = new Monitors()
         // TODO Auto-generated method stub
+        
+        return matrix.m;
     }
 
 }
