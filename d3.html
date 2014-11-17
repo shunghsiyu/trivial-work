@@ -9,7 +9,7 @@
         .link line{
         stroke: #666;
         opacity: 0.6;
-        stroke-width: 5px;
+        stroke-width: 10px;
         }
 
         .node circle {
@@ -88,7 +88,9 @@
     var tFontOver =  40;
 
     var dataset;
-
+    var link1Data;
+    var link2Data;
+    
     var links = [{
         "source": "Chicago",
         "target": "SF"
@@ -300,7 +302,8 @@
 
     console.log(getNormal(398, 20, 110, -20, 1)[0], getNormal(398, 20, 110, -20, 1)[1]);
 
-    setInterval(updateDataset, 5000);
+    var dataUpdateTime = 2500;
+    setInterval(updateDataset, dataUpdateTime);
 
     function updateDataset() {
         d3.json("network.json", function(error, json){
@@ -311,15 +314,23 @@
 
         if(!dataset) return;
 
-        var link1Data = dataset["linkMetrics"].slice(0,23);
+        link1Data = dataset["linkMetrics"].slice(0,23);
         links.forEach(function(link, i) {
             link.inbps = link1Data[i];
         });
+        link.selectAll("line.link1")
+            .transition()
+            .duration(300)
+                .style("stroke", function(d){return getNewColor(d.inbps, link1Color)});
 
-        var link2Data = dataset["linkMetrics"].slice(23,46);
+        link2Data = dataset["linkMetrics"].slice(23,46);
         links.forEach(function(link, i) {
             link.outbps = link2Data[i];
         });
+        link.selectAll("line.link2")
+            .transition()
+            .duration(300)
+                .style("stroke", function(d){return getNewColor(d.outbps, link2Color)});
     }
 
     function unfixNodes() {
@@ -342,7 +353,7 @@
 
     function forceTick() {
         var tchange = 200;
-        var offset = 2.5;
+        var offset = 5;
         link.selectAll("line.link2")
             .attr("x1", function(d) {
                 return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
@@ -356,10 +367,7 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            .transition()
-                .duration(tchange)
-                .style("stroke", function(d){return getNewColor(d.inbps, link2Color)});
-
+                
         offset = offset*-1;
         link.selectAll("line.link1")
             .attr("x1", function(d) {
@@ -374,21 +382,20 @@
             .attr("y2", function(d) {
                 return getNormal(d.target.x, d.target.y, d.source.x, d.source.y, offset)[1];
             })
-            .transition()
-                .duration(tchange)
-                .style("stroke", function(d){return getNewColor(d.outbps, link1Color)});
 
         node.attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")"
         });
 
-        function getNewColor(bps, linkColor) {
-            var maxbps = 100;
-            var svalue = (bps < maxbps) ? bps/maxbps : 1;
-            var oldColor = d3.hsl(linkColor);
-            var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
-            return newColor.toString();
-        }
+    }
+
+    function getNewColor(bps, linkColor) {
+        var maxbps = 10;
+        var logvalue = Math.log(bps);
+        var svalue = (logvalue < maxbps) ? logvalue / maxbps : 1;
+        var oldColor = d3.hsl(linkColor);
+        var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
+        return newColor.toString();
     }
 
     function nodeOver(d) {
