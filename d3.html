@@ -1,7 +1,35 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
-<div id="topology">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="topology">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+        Choose LSP: 
+            <div class="btn-group" style="margin: 9px 0;">
+              <button class="btn btn-primary" id="LSPAll">All</button>
+              <button class="btn btn-primary" id="LSP1">LSP-1</button>
+              <button class="btn btn-primary" id="LSP2">LSP-2</button>
+              <button class="btn btn-primary" id="LSP3">LSP-3</button>
+              <button class="btn btn-primary" id="LSP4">LSP-4</button>
+            </div>
+        </div>
+        <div class="col-sm-6">
+        Adjust Sensitivity: 
+            <div class="btn-group" style="margin: 9px 0;">
+              <button class="btn btn-primary" id="SLow">Low</button>
+              <button class="btn btn-primary" id="SNormal">Normal</button>
+              <button class="btn btn-primary" id="SHigh">High</button>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
         text {
         font-family: sans-serif;
@@ -10,7 +38,7 @@
         .link line{
         stroke: #666;
         opacity: 0.6;
-        stroke-width: 1px;
+        stroke-width: 5px;
         }
 
         .node circle {
@@ -56,7 +84,7 @@
         .d3-tip-link {
           line-height: 1;
           font-weight: bold;
-          font: 30px sans-serif;
+          font: 20px sans-serif;
           padding: 15px;
           background: rgba(0, 0, 0, 0);
           color: #555;
@@ -70,12 +98,13 @@
           left: 0;
         }
 </style>
-
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
-    var width = 1200;
-    var height = 800;
+    var width = 1000;
+    var height = 700;
     
     var nodesFixed = false;
     var dTransitionClicked = 750;
@@ -85,14 +114,18 @@
     var cColorDefault = "#00A88F";
     var cColorOver = "lawngreen";
     var tXMultiplier = 1.5;
-    var tFontDefault = 30
-    var tFontOver =  40;
+    var tFontDefault = 20;
+    var tFontOver =  25;
     var tColor = "black";
-    var pathScale = 3;
-    var baseColor = "grey"
+    var pathScale = cRadiusDefault/4;
+    var baseColor = "grey";
+    var sqaureColor = "white";
     var lHighligtedOpacity = 0.6;
     var lUnhighlightedOpacity = 0.2;
+    var routerNum = 8;
 
+    var minOpacity = 0.2;
+    var sensitivity = 2;
 
     var dataset;
     var linkNum = 23;
@@ -101,7 +134,7 @@
     var link1Color = "#00A88F";
     var link2Color = "#00A88F";
 
-    var highlightedMode = false;
+    var highlightedLSP = "All";
 
     var links = [{
         "source": "Chicago",
@@ -200,52 +233,72 @@
 
     updateDataset();
 
+    d3.select("#LSPAll")
+        .on("click", function(d) {highlightedLSP = "All";});
+    d3.select("#LSP1")
+        .on("click", function(d) {highlightedLSP = "1";});
+    d3.select("#LSP2")
+        .on("click", function(d) {highlightedLSP = "2";});
+    d3.select("#LSP3")
+        .on("click", function(d) {highlightedLSP = "3";});
+    d3.select("#LSP4")
+        .on("click", function(d) {highlightedLSP = "4";});
+
+    d3.select("#SLow")
+        .on("click", function(d) {sensitivity = 1;});
+    d3.select("#SNormal")
+        .on("click", function(d) {sensitivity = 2;});
+    d3.select("#SHigh")
+        .on("click", function(d) {sensitivity = 10;});
+
+
     var nodeTip = d3.tip()
                 .attr("class", "d3-tip-node")
                 .offset([-10, 0])
                 .direction('n')
-                .html(function(d){return "Server load: 51%<br/>"+d.x+", "+d.y;});
+                .html(function(d){return d.name+"<br/>"+d.x+", "+d.y;});
 
     var linkTip = d3.tip()
                 .attr("class", "d3-tip-link")
                 .offset([0, 0])
-                .html(function(d){return "This is a link";});
+                .html(function(d){return "<p align=\"left\">Top: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + d.inbps + " bps<br />" + "Bottom: " + d.outbps + " bps</p>";});
 
     var force = d3.layout.force()
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(50)
+        .linkDistance(150)
         .friction(0.9)
+        .gravity(0.0001)
         .charge(-200)
         .on("tick", forceTick)
         .start();
 
     force.alpha(0);
     fixNodes();
-    nodes["NY"].px = 810;
+    nodes["NY"].px = 710;
     nodes["NY"].py = 310;
-    nodes["SF"].px = 280;
+    nodes["SF"].px = 180;
     nodes["SF"].py = 310;
-    nodes["Chicago"].px = 530;
+    nodes["Chicago"].px = 430;
     nodes["Chicago"].py = 190;
-    nodes["Houston"].px = 530;
+    nodes["Houston"].px = 430;
     nodes["Houston"].py = 460;
-    nodes["LA"].px = 360;
+    nodes["LA"].px = 260;
     nodes["LA"].py = 460;
-    nodes["Tampa"].px = 730;
+    nodes["Tampa"].px = 630;
     nodes["Tampa"].py = 460;
-    nodes["Dallas"].px = 450;
+    nodes["Dallas"].px = 350;
     nodes["Dallas"].py = 310;
-    nodes["Miami"].px = 610;
+    nodes["Miami"].px = 510;
     nodes["Miami"].py = 310;
-    nodes["Server"].px = 120;
+    nodes["Server"].px = 20;
     nodes["Server"].py = 310;
-    nodes["Client"].px = 970;
+    nodes["Client"].px = 870;
     nodes["Client"].py = 310;
-    nodes["IXIA1"].px = 520;
+    nodes["IXIA1"].px = 420;
     nodes["IXIA1"].py = 70;
-    nodes["IXIA2"].px = 520;
+    nodes["IXIA2"].px = 420;
     nodes["IXIA2"].py = 610;
     force.start();
 
@@ -306,12 +359,20 @@
 
     var cColor = ["#FF74C3", "#BCBF00", "#00BED1", "#8D5649", "#FF7F00", "#1776B6", "#24A221", "#D8241F", "9564BF"];
 
+    node.append("text")
+        .attr("x", cRadiusDefault*tXMultiplier)
+        .attr("y", "-"+cRadiusDefault/2+"px")
+        .style("font-size", tFontDefault+"px")
+        .style("fill", tColor)
+        .text(function(d) {
+            return d.name;
+        });
 
     node.append("path")
         .attr("class", "path")
         .attr("d", d3.svg.symbol().type(function(d){ return (d.mys) ? d.mys : "circle";}))
         .attr("transform", function(d){
-            var scaleTo = (d.mys) ? 1 : pathScale;
+            var scaleTo = (d.mys) ? 2.5 : pathScale;
             return "scale("+scaleTo+")";
         })
 
@@ -319,47 +380,37 @@
     node.selectAll('.path')
         .style("fill", function(d, i){
             if (!d.mys) {
-                var c = cColor[myI%8];
+                var c = cColor[myI%routerNum];
                 myI = myI+1;
                 return c;
             } else {
-                return "grey";
+                return baseColor;
             }
         })
         .attr("data-defaultC", function(d, i){
             if (!d.mys) {
-                var c = cColor[myI%8];
+                var c = cColor[myI%routerNum];
                 myI = myI+1;
                 return c;
             } else {
-                return "grey";
+                return baseColor;
             }
         })
         .attr("data-defaultC", function(d, i){
             if (!d.mys) {
-                var c = cColor[myI%8];
+                var c = cColor[myI%routerNum];
                 myI = myI+1;
                 return c;
             } else {
-                return "grey";
+                return baseColor;
             }
-        }); 
-    myI = 0;
+        });
 
     node.selectAll('.path')
         .filter(function(d) {return (d.mys);})
-            .style("fill", "white")
-            .style("stroke", "grey")
+            .style("fill", sqaureColor)
+            .style("stroke", baseColor)
             .style("stroke-width", "2px");
-
-    /*node.append("text")
-        .attr("x", cRadiusDefault*tXMultiplier)
-        .attr("y", "-"+cRadiusDefault/2+"px")
-        .style("font-size", tFontDefault+"px")
-        .style("fill", tColor)
-        .text(function(d) {
-            return d.name;
-        });*/
 
     var dataUpdateTime = 10000;
     setInterval(updateDataset, dataUpdateTime);
@@ -411,6 +462,8 @@
                 .style("opacity", function(d){
                     return getNewOpacity(d.outbps);
                 });
+
+        hightlightLSP();
     }
 
     function unfixNodes() {
@@ -433,7 +486,7 @@
 
     function forceTick() {
         var tchange = 200;
-        var offset = 0.5;
+        var offset = 2.5;
         link.selectAll("line.link2")
             .attr("x1", function(d) {
                 return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
@@ -470,18 +523,31 @@
     }
 
     function getNewColor(bps, linkColor) {
+        var svalue = 0;
+        if(bps==0) {
+
+        } else {
         var maxbps = 8000000000*0.8;
-        var logMaxbps = Math.log(maxbps)
-        var svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
+        var logMaxbps = Math.log(maxbps+1)
+        svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
+        }
+        svalue = Math.pow(svalue, 1/sensitivity);
         var oldColor = d3.hsl(linkColor);
         var newColor = d3.hsl(oldColor.h, svalue, oldColor.l);
         return newColor.toString();
     }
 
     function getNewOpacity(bps) {
+        var svalue = 0;
+        if(bps==0) {
+
+        } else {
         var maxbps = 8000000000*0.8;
-        var logMaxbps = Math.log(maxbps)
-        var svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
+        var logMaxbps = Math.log(maxbps+1)
+        svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
+        }
+        svalue = Math.pow(svalue, 1/sensitivity);
+        svalue = (svalue < minOpacity) ? minOpacity : svalue;
         return svalue;
     }
 
@@ -515,53 +581,7 @@
     }
     
     function nodeClick(d) {
-        if(!highlightedMode) {
-            var LSPnum = "1";
 
-            console.log(LSP[LSPnum]);
-
-            unhighlightAll();
-            link.selectAll("line.link1")
-            .attr("data-highlight", function(d) {
-                var n = d3.select(this).attr("data-num");
-                n = parseInt(n);
-                var index = LSP[LSPnum].indexOf(n);
-                var size = LSP[LSPnum].length;
-                var value1 = LSP[LSPnum][index];
-                var value2 = LSP[LSPnum][index+size/2];
-                var compare = n%23;
-                if(index == -1) {
-                    return "false";
-                } else if(value1 == compare || value2 == compare){
-                    return "true";
-                }
-                else
-                    return "false";
-            });
-            
-            link.selectAll("line.link2")
-            .attr("data-highlight", function(d) {
-                var n = d3.select(this).attr("data-num");
-                n = parseInt(n);
-                var index = LSP[LSPnum].indexOf(n);
-                var size = LSP[LSPnum].length;
-                var value1 = LSP[LSPnum][index];
-                var value2 = LSP[LSPnum][index+size/2];
-                var compare = n%23+23;
-                if(index == -1) {
-                    return "false";
-                } else if(value1 == compare || value2 == compare){
-                    return "true";
-                }
-                else
-                    return "false";
-            });
-        }
-        else
-            highlightAll();
-
-        highlightedMode = !highlightedMode;
-        updateDraw();
     }
 
     function nodeDbClick(d) {
@@ -614,5 +634,51 @@
         link.selectAll("line")
             .attr("data-highlight", "true");
     }
+
+    function hightlightLSP() {
+            if(highlightedLSP != "All") {
+            var LSPnum = highlightedLSP;
+
+            unhighlightAll();
+            link.selectAll("line.link1")
+            .attr("data-highlight", function(d) {
+                var n = d3.select(this).attr("data-num");
+                n = parseInt(n);
+                var index = LSP[LSPnum].indexOf(n);
+                var size = LSP[LSPnum].length;
+                var value1 = LSP[LSPnum][index];
+                var value2 = LSP[LSPnum][index+size/2];
+                var compare = n%23;
+                if(index == -1) {
+                    return "false";
+                } else if(value1 == compare || value2 == compare){
+                    return "true";
+                }
+                else
+                    return "false";
+            });
+            
+            link.selectAll("line.link2")
+            .attr("data-highlight", function(d) {
+                var n = d3.select(this).attr("data-num");
+                n = parseInt(n);
+                var index = LSP[LSPnum].indexOf(n);
+                var size = LSP[LSPnum].length;
+                var value1 = LSP[LSPnum][index];
+                var value2 = LSP[LSPnum][index+size/2];
+                var compare = n%23+23;
+                if(index == -1) {
+                    return "false";
+                } else if(value1 == compare || value2 == compare){
+                    return "true";
+                }
+                else
+                    return "false";
+            });
+        }
+        else
+            highlightAll();
+    }
+
 </script>
 </body>
