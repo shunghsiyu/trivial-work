@@ -10,7 +10,7 @@
         .link line{
         stroke: #666;
         opacity: 0.6;
-        stroke-width: 10px;
+        stroke-width: 1px;
         }
 
         .node circle {
@@ -82,13 +82,13 @@
     var dTransitionOver = 300;
     var cRadiusDefault = 30;
     var cRadiusOver = cRadiusDefault*1.1;
-    var cColorDefault = "seagreen";
+    var cColorDefault = "#00A88F";
     var cColorOver = "lawngreen";
     var tXMultiplier = 1.5;
     var tFontDefault = 30
     var tFontOver =  40;
     var tColor = "black";
-    var pathScale = 7;
+    var pathScale = 3;
     var baseColor = "grey"
     var lHighligtedOpacity = 0.6;
     var lUnhighlightedOpacity = 0.2;
@@ -98,8 +98,8 @@
     var linkNum = 23;
     var link1Data;
     var link2Data;
-    var link1Color = "#2222CC";
-    var link2Color = "#CC2222";
+    var link1Color = "#00A88F";
+    var link2Color = "#00A88F";
 
     var highlightedMode = false;
 
@@ -215,9 +215,9 @@
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(200)
+        .linkDistance(50)
         .friction(0.9)
-        .charge(-800)
+        .charge(-200)
         .on("tick", forceTick)
         .start();
 
@@ -304,23 +304,62 @@
         .call(force.drag)
         .call(nodeTip);
 
+    var cColor = ["#FF74C3", "#BCBF00", "#00BED1", "#8D5649", "#FF7F00", "#1776B6", "#24A221", "#D8241F", "9564BF"];
+
+
     node.append("path")
         .attr("class", "path")
         .attr("d", d3.svg.symbol().type(function(d){ return (d.mys) ? d.mys : "circle";}))
-        .attr("transform", "scale("+pathScale+")");
+        .attr("transform", function(d){
+            var scaleTo = (d.mys) ? 1 : pathScale;
+            return "scale("+scaleTo+")";
+        })
+
+    var myI = 0;
+    node.selectAll('.path')
+        .style("fill", function(d, i){
+            if (!d.mys) {
+                var c = cColor[myI%8];
+                myI = myI+1;
+                return c;
+            } else {
+                return "grey";
+            }
+        })
+        .attr("data-defaultC", function(d, i){
+            if (!d.mys) {
+                var c = cColor[myI%8];
+                myI = myI+1;
+                return c;
+            } else {
+                return "grey";
+            }
+        })
+        .attr("data-defaultC", function(d, i){
+            if (!d.mys) {
+                var c = cColor[myI%8];
+                myI = myI+1;
+                return c;
+            } else {
+                return "grey";
+            }
+        }); 
+    myI = 0;
 
     node.selectAll('.path')
-        .style("fill", function(d){return (d.mys)?baseColor:cColorDefault})
-        .attr("data-defaultC", function(d){return (d.mys)?baseColor:cColorDefault});;
+        .filter(function(d) {return (d.mys);})
+            .style("fill", "white")
+            .style("stroke", "grey")
+            .style("stroke-width", "2px");
 
-    node.append("text")
+    /*node.append("text")
         .attr("x", cRadiusDefault*tXMultiplier)
         .attr("y", "-"+cRadiusDefault/2+"px")
         .style("font-size", tFontDefault+"px")
         .style("fill", tColor)
         .text(function(d) {
             return d.name;
-        });
+        });*/
 
     var dataUpdateTime = 10000;
     setInterval(updateDataset, dataUpdateTime);
@@ -353,10 +392,7 @@
                         return baseColor;
                 })
                 .style("opacity", function(d){
-                    if(d3.select(this).attr("data-highlight") == "true")
-                        return lHighligtedOpacity;
-                    else
-                        return lUnhighlightedOpacity;
+                    return getNewOpacity(d.inbps);
                 });
 
         link2Data = dataset.datas.data.slice(23,46);
@@ -373,10 +409,7 @@
                         return baseColor;
                 })
                 .style("opacity", function(d){
-                    if(d3.select(this).attr("data-highlight") == "true")
-                        return lHighligtedOpacity;
-                    else
-                        return lUnhighlightedOpacity;
+                    return getNewOpacity(d.outbps);
                 });
     }
 
@@ -400,7 +433,7 @@
 
     function forceTick() {
         var tchange = 200;
-        var offset = 5;
+        var offset = 0.5;
         link.selectAll("line.link2")
             .attr("x1", function(d) {
                 return getNormal(d.source.x, d.source.y, d.target.x, d.target.y, offset)[0];
@@ -445,6 +478,13 @@
         return newColor.toString();
     }
 
+    function getNewOpacity(bps) {
+        var maxbps = 8000000000*0.8;
+        var logMaxbps = Math.log(maxbps)
+        var svalue = (bps < maxbps) ? Math.log(bps)/logMaxbps : 1;
+        return svalue;
+    }
+
     function nodeOver(d) {
         d3.select(this).select("path").transition()
             .duration(dTransitionOver)
@@ -464,7 +504,12 @@
             .style("font-size", tFontDefault+"px");
         d3.select(this).select("path").transition()
             .duration(dTransitionOver)
-            .style("fill", function(d){return (d.mys) ? baseColor : cColorDefault;})
+            .style("fill", function(d){
+                if (!d.mys)
+                    return d3.select(this).attr("data-defaultC");
+                else
+                    return "white";
+            })
             .attr("r", cRadiusDefault);
         nodeTip.hide(d);
     }
