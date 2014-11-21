@@ -1,4 +1,5 @@
 package assignment3;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractMap.SimpleEntry;
@@ -17,38 +18,40 @@ public class DegreeOfSeperation {
 
 	public static void main(String[] args) {
 		/* --- Some examples --- */
-		
+
 		// Constructor (do not use 'new')
 		int vertexID = 0;
 		Vertex vertex0 = Vertex.getVertex(vertexID);
-		
-		// Set to cost of vertex from start it its smaller than the original cost
+
+		// Set to cost of vertex from start it its smaller than the original
+		// cost
 		double newCost = 0;
 		vertex0.setCostFromStartIfSmaller(newCost);
-		
+
 		// Get the cost of vertex from start
 		double cost = vertex0.getCostFromStart();
 		System.out.println("The cost of " + vertex0 + " from start is " + cost);
-		
+
 		// Get the neighbors and the cost to neighbors of a vertex
 		List<Entry<Vertex, Double>> list = vertex0.getNeighbors();
 		System.out.println("The neighbors of " + vertex0 + " are:");
-		for(Entry<Vertex, Double> e: list) {
-			System.out.println("\t" + e.getKey() + " (cost from " + vertex0 +" to " + e.getKey() +": " + e.getValue() + ")");
+		for (Entry<Vertex, Double> e : list) {
+			System.out.println("\t" + e.getKey() + " (cost from " + vertex0
+					+ " to " + e.getKey() + ": " + e.getValue() + ")");
 		}
-		
+
 		// Check if a vertex is visited
-		if(vertex0.isVisited()) {
+		if (vertex0.isVisited()) {
 			System.out.println(vertex0 + " has been visited");
 		} else {
 			System.out.println(vertex0 + " has not been visited yet");
 		}
-		
+
 		// Set a vertex as visited
 		vertex0.setVisited(true);
-		
+
 		/* --- Example ends --- */
-		
+
 		// TODO Implement
 	}
 
@@ -115,24 +118,24 @@ public class DegreeOfSeperation {
 						newVertex, cost);
 				newNeighborList.add(vertexCostEntry);
 			}
-			
+
 			this.neighbors = newNeighborList;
 		}
 
 		List<Integer> getNeighborIDFromFile() {
-			if(input == null) {
+			if (input == null) {
 				input = readInputFile();
 			}
-			
+
 			List<Integer> neighbors = new ArrayList<>();
 			List<Integer> list1 = resultToList(findIDAtEnd());
 			List<Integer> list2 = resultToList(findIDAtStart());
 			neighbors.addAll(list1);
 			neighbors.addAll(list2);
-			
+
 			return neighbors;
 		}
-		
+
 		static String readInputFile() {
 			String toReturn = "";
 			try {
@@ -146,26 +149,28 @@ public class DegreeOfSeperation {
 			}
 			return toReturn;
 		}
-		
+
 		Matcher findIDAtEnd() {
 			String patternString = "^(\\d+)\\s" + this.id + "$";
-			return Pattern.compile(patternString, Pattern.MULTILINE).matcher(input);
+			return Pattern.compile(patternString, Pattern.MULTILINE).matcher(
+					input);
 		}
-		
+
 		Matcher findIDAtStart() {
 			String patternString = "^" + this.id + "\\s(\\d+)$";
-			return Pattern.compile(patternString, Pattern.MULTILINE).matcher(input);
+			return Pattern.compile(patternString, Pattern.MULTILINE).matcher(
+					input);
 		}
-		
+
 		List<Integer> resultToList(Matcher m) {
 			int group = 1;
 			List<Integer> list = new ArrayList<Integer>();
-			while(m.find()) {
+			while (m.find()) {
 				list.add(Integer.parseInt(m.group(group)));
 			}
 			return list;
 		}
-		
+
 		@Override
 		public String toString() {
 			return "vertex#" + id;

@@ -15,7 +15,7 @@ import org.junit.Test;
 import assignment3.DegreeOfSeperation.Vertex;
 
 public class VertexTest {
-
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
