@@ -11,9 +11,44 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import assignment3.DegreeOfSeperation.Vertex;
+
 public class DegreeOfSeperation {
 
 	public static void main(String[] args) {
+		/* --- Some examples --- */
+		
+		// Constructor (do not use 'new')
+		int vertexID = 0;
+		Vertex vertex0 = Vertex.getVertex(vertexID);
+		
+		// Set to cost of vertex from start it its smaller than the original cost
+		double newCost = 0;
+		vertex0.setCostFromStartIfSmaller(newCost);
+		
+		// Get the cost of vertex from start
+		double cost = vertex0.getCostFromStart();
+		System.out.println("The cost of " + vertex0 + " from start is " + cost);
+		
+		// Get the neighbors and the cost to neighbors of a vertex
+		List<Entry<Vertex, Double>> list = vertex0.getNeighbors();
+		System.out.println("The neighbors of " + vertex0 + " are:");
+		for(Entry<Vertex, Double> e: list) {
+			System.out.println("\t" + e.getKey() + " (cost from " + vertex0 +" to " + e.getKey() +": " + e.getValue() + ")");
+		}
+		
+		// Check if a vertex is visited
+		if(vertex0.isVisited()) {
+			System.out.println(vertex0 + " has been visited");
+		} else {
+			System.out.println(vertex0 + " has not been visited yet");
+		}
+		
+		// Set a vertex as visited
+		vertex0.setVisited(true);
+		
+		/* --- Example ends --- */
+		
 		// TODO Implement
 	}
 
@@ -129,6 +164,11 @@ public class DegreeOfSeperation {
 				list.add(Integer.parseInt(m.group(group)));
 			}
 			return list;
+		}
+		
+		@Override
+		public String toString() {
+			return "vertex#" + id;
 		}
 	}
 }
