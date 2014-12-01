@@ -15,7 +15,9 @@ import java.util.regex.Pattern;
 import assignment3.DegreeOfSeperation.Vertex;
 
 public class DegreeOfSeperation {
-
+ private static final int inf = Integer.MAX_VALUE;
+       private char[]vertexs;
+       private int[][]matrix;
 	public static void main(String[] args) {
 		/* --- Some examples --- */
 
@@ -54,6 +56,39 @@ public class DegreeOfSeperation {
 
 		// TODO Implement
 	}
+	
+	public void dijkstra(int vs, int[]prev,int[]cost){
+    boolean [] route=new boolean[vertexs.length];//find the shortest route
+    
+    for (int i=0;i<vertexs.length;i++){
+        route[i]=false;
+        prev[i]=0;
+        cost[i]=matrix[vs][i];
+    }
+     route[vs]=true;//inialize the vetex
+     cost[vs]=0;
+     int n=0;
+     // find every vertex shortest route
+     for(int i=1;i<vertexs.length;i++){
+         int min=inf;
+         for (int j=0;j<vertexs.length;j++){
+             if(route[j]=false&&cost[j]<min){
+                 min=cost[j];
+                 n=j;
+             }
+         }
+         route[n]=true;//tag the route
+//update the route and update previous vertex
+         for (int j=0;j<vertexs.length;j++){
+            int tmp=(matrix[n][j]==inf?inf:(min+matrix[n][j]));
+            if(route[j]=false&&(tmp<cost[j])){
+                cost[j]=tmp;
+                prev[j]=n;
+            }
+        }
+         
+     }
+}
 
 	public static class Vertex {
 		public static final String INPUT_FILENAME = "facebook_combined.txt";
