@@ -1,5 +1,6 @@
 package assignment3;
 
+
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -11,8 +12,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import assignment3.DegreeOfSeperation.Vertex;
 
 public class VertexTest {
 	
@@ -70,20 +69,19 @@ public class VertexTest {
 		vertex.setVisited(true);
 		assertTrue(vertex.isVisited());
 	}
-
+	
 	@Test
 	public void testGetNeighbors() {
 		int id = 16;
 		Vertex vertex = Vertex.getVertex(id);
-		List<Entry<Vertex, Double>> list = vertex.getNeighbors();
+		List<Vertex> list = vertex.getNeighbors();
 		int[] neighbors = new int[] {0, 29, 82, 118, 172, 261, 329, 331, 332};
 		assertTrue(list.size() == neighbors.length);
 		for(int i = 0; i < list.size(); i++) {
-			assertTrue(list.get(i).getKey().id == neighbors[i]);
-			assertEquals(1.0, list.get(i).getValue(), 0.001);;
+			assertTrue(list.get(i).id == neighbors[i]);
 		}
 	}
-
+	/*
 	@Test
 	public void testPopulateNeighbors() {
 		int id = 17;
@@ -138,5 +136,5 @@ public class VertexTest {
 			m.find();
 			assertEquals(String.valueOf(neighborsAsTarget[i]), m.group(1));
 		}
-	}
+	}*/
 }
