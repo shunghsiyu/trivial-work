@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<div id="div-svg"></div>
+<style>
+</style>
+
+<script src=http://d3js.org/d3.v3.min.js></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+    var width = 1000;
+    var height = 600;
+    var cr = 30;
+    var cx = 80;
+    var cy = 80;
+    var hue = Math.random()*360;
+    var dataset = [hue];
+
+    var svg = d3.select("#div-svg").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var circle = svg.selectAll("circle")
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .style("fill", "black")
+      .attr("r", cr)
+      .attr("cx", function(d,i){return (i+1)*cx;})
+      .attr("cy", cy);
+
+    mytick()
+    
+    function mytick() {
+      dataset.push(Math.random()*360);
+      dataset.shift();
+      circle
+        .data(dataset)
+        .transition()
+          .duration(2000)
+          .style("fill", function(d){return d3.hsl(d, 1, 0.5).toString()})
+          .each("end", mytick);
+    }
+</script>
+</body>
